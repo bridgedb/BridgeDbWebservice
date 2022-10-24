@@ -11,7 +11,10 @@ import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Restlet;
 import org.restlet.data.MediaType;
+import org.restlet.routing.Extractor;
 import org.restlet.routing.Filter;
+import org.restlet.routing.Redirector;
+import org.restlet.routing.Route;
 import org.restlet.routing.Router;
 import org.restlet.routing.Template;
 import org.restlet.routing.TemplateRoute;
@@ -22,11 +25,40 @@ public class RestletService extends Application{
 	public static final String CONF_GDBS = "C:/Users/Helena/Documents/Projects/BridgeDb/Webservice/gdb.config";
 	public static final String PAR_ORGANISM = "organism";
 	public static final String PAR_ID = "id";
+	public static final String PAR_SYSTEM = "system";
+	public static final String PAR_QUERY = "query";
+	public static final String PAR_DATASOURCES = "datasources";
+
+	public static final String PAR_TARGET_SYSTEM = "dataSource";
+	public static final String PAR_TARGET_ATTR_NAME = "attrName";
+	public static final String PAR_TARGET_LIMIT = "limit";
+	
+	public static final String PAR_SOURCE_SYSTEM = "src";
+	public static final String PAR_DEST_SYSTEM = "dest";
+
 	public final File configFile;
 	private boolean transitive;
 	
 	public static final String URL_PROPERTIES = "/{" + PAR_ORGANISM + "}/properties";
-	
+	public static final String URL_ATTRIBUTES = "/{" + PAR_ORGANISM + "}/attributes/{" + PAR_SYSTEM + "}/{" + PAR_ID + "}";
+	public static final String URL_DATASOURCES = "/" + PAR_DATASOURCES;
+	public static final String URL_ATTRIBUTE_SET = "/{" + PAR_ORGANISM + "}/attributeSet";
+	public static final String URL_ATTRIBUTE_SEARCH_WITH_LIMIT_ATTR_NAME =  "/{" + PAR_ORGANISM + "}/attributeSearch/{" + PAR_QUERY + "}/{"+PAR_TARGET_LIMIT + "}/{"+PAR_TARGET_ATTR_NAME + "}";
+	public static final String URL_ATTRIBUTE_SEARCH_WITH_LIMIT = "/{" + PAR_ORGANISM + "}/attributeSearch/{" + PAR_QUERY + "}/{"+PAR_TARGET_LIMIT + "}";
+	public static final String URL_ATTRIBUTE_SEARCH = "/{" + PAR_ORGANISM + "}/attributeSearch/{" + PAR_QUERY + "}";
+	public static final String URL_SUPPORTED_SOURCE_DATASOURCES = "/{" + PAR_ORGANISM + "}/sourceDataSources";
+	public static final String URL_SUPPORTED_TARGET_DATASOURCES = "/{" + PAR_ORGANISM + "}/targetDataSources";
+	public static final String URL_IS_FREE_SEARCH_SUPPORTED = "/{" + PAR_ORGANISM + "}/isFreeSearchSupported";
+	public static final String URL_IS_MAPPING_SUPPORTED = "/{" + PAR_ORGANISM + "}/isMappingSupported/{" + PAR_SOURCE_SYSTEM + "}/{" + PAR_DEST_SYSTEM + "}";
+	public static final String URL_CONFIG = "/config";
+	public static final String URL_CONTENTS = "/contents";
+	public static final String URL_NO_MATCH = "/{" + PAR_ORGANISM + "}";
+	public static final String URL_XREFS = "/{" + PAR_ORGANISM + "}/xrefs/{" + PAR_SYSTEM + "}/{" + PAR_ID + "}";
+	public static final String URL_SEARCH = "/{" + PAR_ORGANISM + "}/search/{" + PAR_QUERY + "}";
+	public static final String URL_XREF_EXISTS = "/{" + PAR_ORGANISM + "}/xrefExists/{" + PAR_SYSTEM + "}/{" + PAR_ID + "}";
+	public static final String URL_HOME = "/";
+	public static final String URL_BACK_PAGE_TEXT = "/{" + PAR_ORGANISM + "}/backPageText/{" + PAR_SYSTEM + "}/{" + PAR_ID + "}";
+
 	private GdbProvider gdbProvider;
 	
 	public RestletService(File aConfigFile, boolean transitive)
@@ -55,22 +87,41 @@ public class RestletService extends Application{
 		connectGdbs();
 	}
 	
-	public Restlet createRoot() {
-		Router router = new Router(getContext());
-		router.attach (URL_PROPERTIES, Properties.class );
-		return router;
-	}
-	
     @Override
     public Restlet createInboundRoot() {
         System.out.println("Creating the root");
         Router router = new Router(getContext());
+        Redirector redirector = new Redirector(getContext(), URL_ATTRIBUTE_SEARCH, Redirector.MODE_CLIENT_TEMPORARY);
+        Extractor extractor = new Extractor(getContext(), redirector); 
+        Extractor extractorAttributeName= new Extractor(getContext()); 
+        TemplateRoute route = router.attach (URL_PROPERTIES, Properties.class );
 
-        TemplateRoute route = router.attach("/{organism}/properties", Properties.class);
-        TemplateRoute route2 = router.attach("/test", Properties.class);
-        //route.getTemplate().setMatchingMode(Template.MODE_STARTS_WITH);
-        //route2.getTemplate().setMatchingMode(Template.MODE_STARTS_WITH);
+        router.attach(URL_DATASOURCES, DataSources.class);
         
+		/* AttributeMapper methods */
+        router.attach(URL_ATTRIBUTE_SET, AttributeSet.class);
+
+		//Route attrSearchRoute = router.attach( URL_ATTRIBUTE_SEARCH, AttributeSearch.class );
+	    //extractor.extractFromEntity(PAR_TARGET_LIMIT,PAR_TARGET_LIMIT, true);
+	   // extractor.extractFromEntity(PAR_TARGET_ATTR_NAME,PAR_TARGET_ATTR_NAME, true);
+        
+        Route attrSearchRoute = router.attach(URL_ATTRIBUTE_SEARCH, AttributeSearch.class);
+        router.attach(URL_ATTRIBUTE_SEARCH_WITH_LIMIT, AttributeSearch.class);
+        router.attach(URL_ATTRIBUTE_SEARCH_WITH_LIMIT_ATTR_NAME, AttributeSearch.class);
+       // extractor.extractFromQuery(PAR_QUERY, PAR_QUERY, true);
+	   // router.attach("/{" + PAR_ORGANISM + "}/attributeSearch/",AttributeSearch.class);
+        //router.attach("/{" + PAR_ORGANISM + "}/attributeSearch/",extractor);
+        //extractor.setNext(AttributeSearch.class);
+        //router.attach("/attributeSearch", extractor);
+		//extractorAttributeName.extractFromEntity( PAR_TARGET_ATTR_NAME, PAR_TARGET_ATTR_NAME, true );
+		Route attributesRoute = router.attach(URL_ATTRIBUTES, Attributes.class );
+		//router.attach("/{" + PAR_ORGANISM + "}/attributeSearch/",extractorAttributeName);
+		//extractorAttributeName.setNext(Attributes.class);
+		router.attach(URL_SUPPORTED_SOURCE_DATASOURCES, SupportedSourceDataSources.class );
+		router.attach(URL_SUPPORTED_TARGET_DATASOURCES, SupportedTargetDataSources.class );
+		router.attach(URL_IS_FREE_SEARCH_SUPPORTED, IsFreeSearchSupported.class );
+		router.attach(URL_IS_MAPPING_SUPPORTED, IsMappingSupported.class );
+		
         Filter preferencesFilter = new Filter(getContext()) {
             protected int beforeHandle(Request request, Response response) {
             	System.out.println("MIME: " + request.getClientInfo().getAcceptedMediaTypes());
@@ -87,6 +138,8 @@ public class RestletService extends Application{
             }            
         };
         preferencesFilter.setNext(router);
+		
+        extractor.setNext(router);
 
         System.out.println("Returning the root");
         return router;

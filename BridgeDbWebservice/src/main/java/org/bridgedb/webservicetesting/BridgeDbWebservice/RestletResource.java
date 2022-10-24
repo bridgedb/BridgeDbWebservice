@@ -54,7 +54,6 @@ public class RestletResource extends ServerResource {
 		orgName = urlDecode(
 				(String) getRequest().getAttributes().get(RestletService.PAR_ORGANISM)
 				);
-		//orgName = "Mosquito";
 		String requestedID = urlDecode(
 				(String) getRequest().getAttributes().get(RestletService.PAR_ID)
 		);

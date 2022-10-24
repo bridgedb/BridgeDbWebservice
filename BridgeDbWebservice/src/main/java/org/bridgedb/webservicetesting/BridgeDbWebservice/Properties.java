@@ -14,33 +14,12 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 public class Properties extends RestletResource{
-	
-    /*
-    @Get("json")
-    public String helloJson() {
-    	String json = "{ \"name\": \"test\", \"java\": true }";
-	    JSONObject convertedObject = new Gson().fromJson(json, JSONObject.class);
-	    GsonBuilder builder = new GsonBuilder().setPrettyPrinting();
-	    Gson gson = builder.create();
-	    String resultString = gson.toJson(convertedObject);
-	    System.out.println(resultString);
-	    return resultString;
-    }
-	
-    @Get("text/plain")
-    public Representation testGetDefault() {
-        return new StringRepresentation("test default : - ok");
-
-    }*/
     
-	//@Get("application/json")
-	@Override
+    @Get("json")
 	public Representation get(Variant variant) {
 		if(MediaType.APPLICATION_JSON.isCompatible(variant.getMediaType())){
-			System.out.println("generating JSON");
 			try
 			{
-		        StringBuilder result = new StringBuilder();
 		        JSONObject jsonObject = new JSONObject();
 		        IDMapperStack stack = getIDMappers();
 			    for(int i = 0; i < stack.getSize(); ++i) 
@@ -62,7 +41,20 @@ public class Properties extends RestletResource{
 			}
 		}
 	else {
-		return new StringRepresentation("test default : - ok");
+		StringBuilder result = new StringBuilder();
+        IDMapperStack stack = getIDMappers();
+	    for(int i = 0; i < stack.getSize(); ++i) 
+	    {
+	    	IDMapper mapper = stack.getIDMapperAt(i);
+	    	for (String key : mapper.getCapabilities().getKeys())
+	    	{
+	    		result.append( key );
+	    		result.append( "\t" );
+	    		result.append( mapper.getCapabilities().getProperty(key) );
+	    		result.append( "\n" );
+	    	}
+	    }
+	    return new StringRepresentation(result.toString());
 	}
 	}
     

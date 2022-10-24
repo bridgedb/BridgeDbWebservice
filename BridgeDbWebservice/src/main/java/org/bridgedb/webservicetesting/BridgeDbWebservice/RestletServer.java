@@ -28,7 +28,6 @@ public class RestletServer {
 		try {
 			component.stop();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

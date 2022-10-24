@@ -1,24 +1,37 @@
 ----------------------------------------------------------------
-Thu Oct 06 16:06:25 CEST 2022:
-Booting Derby (version The Apache Software Foundation - Apache Derby - 10.15.2.0 - (1873585)) instance a816c00e-0183-ad9e-6f4e-00000f840ca0 
+Thu Oct 20 10:51:17 CEST 2022:
+Booting Derby (version The Apache Software Foundation - Apache Derby - 10.15.2.0 - (1873585)) instance a816c00e-0183-f496-f49b-00000f8cbc98 
 on database directory jar:(C:\Users\Helena\Documents\Projects\BridgeDb\Webservice\Mm_Derby_Ensembl_103.bridge)database in READ ONLY mode with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@5c29bfd. 
 Loaded from file:/C:/Users/Helena/.m2/repository/org/apache/derby/derby/10.15.2.0/derby-10.15.2.0.jar.
 java.vendor=Oracle Corporation
 java.runtime.version=11.0.13+10-LTS-370
-user.dir=C:\Users\Helena\eclipse-workspace\BridgeDbWebservice
+user.dir=C:\Users\Helena\git\BridgeDbWebservice\BridgeDbWebservice
 os.name=Windows 10
 os.arch=amd64
 os.version=10.0
 derby.system.home=null
 Database Class Loader started - derby.database.classpath=''
 ----------------------------------------------------------------
-Thu Oct 06 16:06:26 CEST 2022:
-Booting Derby (version The Apache Software Foundation - Apache Derby - 10.15.2.0 - (1873585)) instance b8450018-0183-ad9e-6f4e-00000f840ca0 
+Thu Oct 20 10:51:17 CEST 2022:
+Booting Derby (version The Apache Software Foundation - Apache Derby - 10.15.2.0 - (1873585)) instance b8450018-0183-f496-f49b-00000f8cbc98 
+on database directory jar:(C:\Users\Helena\Documents\Projects\BridgeDb\Webservice\Hs_Derby_Ensembl_103.bridge)database in READ ONLY mode with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@5c29bfd. 
+Loaded from file:/C:/Users/Helena/.m2/repository/org/apache/derby/derby/10.15.2.0/derby-10.15.2.0.jar.
+java.vendor=Oracle Corporation
+java.runtime.version=11.0.13+10-LTS-370
+user.dir=C:\Users\Helena\git\BridgeDbWebservice\BridgeDbWebservice
+os.name=Windows 10
+os.arch=amd64
+os.version=10.0
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''
+----------------------------------------------------------------
+Thu Oct 20 10:51:18 CEST 2022:
+Booting Derby (version The Apache Software Foundation - Apache Derby - 10.15.2.0 - (1873585)) instance 888c4022-0183-f496-f49b-00000f8cbc98 
 on database directory jar:(C:\Users\Helena\Documents\Projects\BridgeDb\Webservice\metabolites_20210109.bridge)database in READ ONLY mode with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@5c29bfd. 
 Loaded from file:/C:/Users/Helena/.m2/repository/org/apache/derby/derby/10.15.2.0/derby-10.15.2.0.jar.
 java.vendor=Oracle Corporation
 java.runtime.version=11.0.13+10-LTS-370
-user.dir=C:\Users\Helena\eclipse-workspace\BridgeDbWebservice
+user.dir=C:\Users\Helena\git\BridgeDbWebservice\BridgeDbWebservice
 os.name=Windows 10
 os.arch=amd64
 os.version=10.0
