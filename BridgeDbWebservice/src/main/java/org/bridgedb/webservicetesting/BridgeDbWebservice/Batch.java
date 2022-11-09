@@ -26,10 +26,6 @@ public class Batch extends RestletResource {
 		super.doInit();
 		try {
 			System.out.println("Batch Xrefs.doInit start");
-			// Required parameters
-			//String targetDsQueryString = urlDecode((String) getRequest().getAttributes().get(RestletService.PAR_TARGET_DS_QUERY));
-	       // this.targetDsQuery=parseDataSource(targetDsQueryString);
-	       // System.out.println("Target Datasource Query String: " + targetDsQueryString);
 			String dsName = urlDecode((String) getRequest().getAttributes().get(RestletService.PAR_SYSTEM));
 			this.sourceDs = parseDataSource(dsName);
 			String targetDsName = (String) getRequest().getAttributes().get(RestletService.PAR_TARGET_SYSTEM);

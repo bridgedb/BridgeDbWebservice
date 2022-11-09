@@ -30,6 +30,7 @@ public class RestletService extends Application{
 	public static final String PAR_TARGET_SYSTEM = "targetDs";
 	public static final String PAR_TARGET_ATTR_NAME = "attrName";
 	public static final String PAR_TARGET_LIMIT = "limit";
+	public static final String PAR_PARAMS = "params";
 	
 	public static final String PAR_SOURCE_SYSTEM = "src";
 	public static final String PAR_DEST_SYSTEM = "dest";
@@ -42,8 +43,10 @@ public class RestletService extends Application{
 	public static final String URL_ATTRIBUTES = "/{" + PAR_ORGANISM + "}/attributes/{" + PAR_SYSTEM + "}/{" + PAR_ID + "}";
 	public static final String URL_ATTRIBUTES_ATTRNAME_QUERY = "/{" + PAR_ORGANISM + "}/attributes/{" + PAR_SYSTEM + "}/{" + PAR_ID + "}/"+PAR_TARGET_ATTR_NAME;
 	public static final String URL_ATTRIBUTE_SET = "/{" + PAR_ORGANISM + "}/attributeSet";
-	public static final String URL_ATTRIBUTE_SEARCH_WITH_LIMIT_ATTR_NAME =  "/{" + PAR_ORGANISM + "}/attributeSearch/{" + PAR_QUERY + "}/{"+PAR_TARGET_LIMIT + "}/{"+PAR_TARGET_ATTR_NAME + "}";
-	public static final String URL_ATTRIBUTE_SEARCH_WITH_LIMIT = "/{" + PAR_ORGANISM + "}/attributeSearch/{" + PAR_QUERY + "}/{"+PAR_TARGET_LIMIT + "}";
+	//public static final String URL_ATTRIBUTE_SEARCH_WITH_LIMIT_ATTR_NAME =  "/{" + PAR_ORGANISM + "}/attributeSearch/{" + PAR_QUERY + "}/"+PAR_TARGET_LIMIT + "&"+PAR_TARGET_ATTR_NAME;
+	//public static final String URL_ATTRIBUTE_SEARCH_WITH_ATTR_NAME =  "/{" + PAR_ORGANISM + "}/attributeSearch/{" + PAR_QUERY + "}/"+PAR_TARGET_ATTR_NAME;
+	//public static final String URL_ATTRIBUTE_SEARCH_WITH_LIMIT = "/{" + PAR_ORGANISM + "}/attributeSearch/{" + PAR_QUERY + "}/"+PAR_TARGET_LIMIT;
+	public static final String URL_ATTRIBUTE_SEARCH_PARAMS ="/{" + PAR_ORGANISM + "}/attributeSearch/{" + PAR_QUERY + "}/"+ PAR_PARAMS;
 	public static final String URL_ATTRIBUTE_SEARCH = "/{" + PAR_ORGANISM + "}/attributeSearch/{" + PAR_QUERY + "}";
 	public static final String URL_SUPPORTED_SOURCE_DATASOURCES = "/{" + PAR_ORGANISM + "}/sourceDataSources";
 	public static final String URL_SUPPORTED_TARGET_DATASOURCES = "/{" + PAR_ORGANISM + "}/targetDataSources";
@@ -96,7 +99,6 @@ public class RestletService extends Application{
         System.out.println("Creating the root");
         Router router = new Router(getContext());
         Redirector redirector = new Redirector(getContext(), URL_ATTRIBUTE_SEARCH, Redirector.MODE_CLIENT_TEMPORARY);
-        Extractor extractor = new Extractor(getContext(), redirector); 
         		
         TemplateRoute route = router.attach (URL_PROPERTIES, Properties.class );
 
@@ -105,9 +107,16 @@ public class RestletService extends Application{
 		/* AttributeMapper methods */
         router.attach(URL_ATTRIBUTE_SET, AttributeSet.class);
         
+        Extractor extractorAttributeSearch = new Extractor(getContext()); 
+        extractorAttributeSearch.extractFromQuery(PAR_TARGET_ATTR_NAME, PAR_TARGET_ATTR_NAME, true);
+        extractorAttributeSearch.extractFromQuery(PAR_TARGET_LIMIT, PAR_TARGET_LIMIT, true);
+        extractorAttributeSearch.setNext(AttributeSearch.class);
+
         Route attrSearchRoute = router.attach(URL_ATTRIBUTE_SEARCH, AttributeSearch.class);
-        router.attach(URL_ATTRIBUTE_SEARCH_WITH_LIMIT, AttributeSearch.class);
-        router.attach(URL_ATTRIBUTE_SEARCH_WITH_LIMIT_ATTR_NAME, AttributeSearch.class);
+        router.attach(URL_ATTRIBUTE_SEARCH_PARAMS, extractorAttributeSearch);
+       // router.attach(URL_ATTRIBUTE_SEARCH_WITH_LIMIT, extractorAttributeSearch);
+       // router.attach(URL_ATTRIBUTE_SEARCH_WITH_ATTR_NAME, extractorAttributeSearch);
+        //router.attach(URL_ATTRIBUTE_SEARCH_WITH_LIMIT_ATTR_NAME, extractorAttributeSearch);
         
 		Route attributesRoute = router.attach(URL_ATTRIBUTES, Attributes.class );
 		
@@ -116,7 +125,6 @@ public class RestletService extends Application{
         extractorAttributes.setNext(Attributes.class);
         
         router.attach(URL_ATTRIBUTES_ATTRNAME_QUERY, extractorAttributes);
-
 		
 		router.attach(URL_SUPPORTED_SOURCE_DATASOURCES, SupportedSourceDataSources.class );
 		router.attach(URL_SUPPORTED_TARGET_DATASOURCES, SupportedTargetDataSources.class );
@@ -163,8 +171,6 @@ public class RestletService extends Application{
         };
         preferencesFilter.setNext(router);
 		
-        extractor.setNext(router);
-
         System.out.println("Returning the root");
         return router;
     }

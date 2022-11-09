@@ -23,7 +23,9 @@ public class AttributeSearch extends RestletResource {
 			this.searchStr = getAttribute(RestletService.PAR_QUERY);
 			this.attribute = getAttribute(RestletService.PAR_TARGET_ATTR_NAME);
 			String limitStr = getAttribute(RestletService.PAR_TARGET_LIMIT);
-
+			System.out.println("limit string:"+ limitStr);
+			System.out.println("attribute string:"+ attribute);
+			
 			if (null != limitStr) {
 				this.limit = new Integer(limitStr).intValue();
 			}
@@ -38,16 +40,18 @@ public class AttributeSearch extends RestletResource {
 			IDMapperStack stack = getIDMappers();
 			if (attribute == null) attribute = "Symbol"; // use symbol by default.
 			Map<Xref, String> results = stack.freeAttributeSearch(searchStr, attribute, limit);
+			System.out.println("limit :"+ limit);
+			System.out.println("size of results :"+ results.size());
+
 			if (MediaType.APPLICATION_JSON.isCompatible(variant.getMediaType())) {
 				JSONObject jsonObject = new JSONObject();
 				JSONObject attributeSearchResult = new JSONObject();
 				int i=1;
 				for (Xref x : results.keySet()) {
-					attributeSearchResult.put("id: ", x.getId());
 					attributeSearchResult.put("full name: ", x.getDataSource().getFullName());
 					attributeSearchResult.put("xref: ", results.get(x));
 					i++;
-					jsonObject.put(i,attributeSearchResult);
+					jsonObject.put(x.getId(),attributeSearchResult);
 				}
 				
 				return new StringRepresentation(jsonObject.toString());

@@ -68,7 +68,6 @@ public class Xrefs extends RestletResource{
 				result.append(x.getDataSource().getFullName());
 				result.append("\n");
 			}
-			
 			return new StringRepresentation(result.toString());
 			}
 		} catch(Exception e) {
