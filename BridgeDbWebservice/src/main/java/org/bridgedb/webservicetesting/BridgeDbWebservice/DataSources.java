@@ -20,7 +20,6 @@ public class DataSources extends ServerResource{
 	@Get("json")
 	public Representation get(Variant variant) {
 		if(MediaType.APPLICATION_JSON.isCompatible(variant.getMediaType())){
-			System.out.println("generating JSON");
 			String datasourcesTxt = "";
 			String datasourcesHeaders = "";
 			InputStream headers = DataSourceTxt.class.getClassLoader().getResourceAsStream("org/bridgedb/bio/datasources_headers.tsv");	

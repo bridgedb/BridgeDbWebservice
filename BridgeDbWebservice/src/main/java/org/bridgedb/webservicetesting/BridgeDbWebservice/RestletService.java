@@ -16,7 +16,6 @@ import org.restlet.routing.Filter;
 import org.restlet.routing.Redirector;
 import org.restlet.routing.Route;
 import org.restlet.routing.Router;
-import org.restlet.routing.Template;
 import org.restlet.routing.TemplateRoute;
 
 public class RestletService extends Application{
@@ -28,8 +27,7 @@ public class RestletService extends Application{
 	public static final String PAR_SYSTEM = "system";
 	public static final String PAR_QUERY = "query";
 	public static final String PAR_DATASOURCES = "datasources";
-
-	public static final String PAR_TARGET_SYSTEM = "dataSource";
+	public static final String PAR_TARGET_SYSTEM = "targetDs";
 	public static final String PAR_TARGET_ATTR_NAME = "attrName";
 	public static final String PAR_TARGET_LIMIT = "limit";
 	
@@ -40,8 +38,9 @@ public class RestletService extends Application{
 	private boolean transitive;
 	
 	public static final String URL_PROPERTIES = "/{" + PAR_ORGANISM + "}/properties";
-	public static final String URL_ATTRIBUTES = "/{" + PAR_ORGANISM + "}/attributes/{" + PAR_SYSTEM + "}/{" + PAR_ID + "}";
 	public static final String URL_DATASOURCES = "/" + PAR_DATASOURCES;
+	public static final String URL_ATTRIBUTES = "/{" + PAR_ORGANISM + "}/attributes/{" + PAR_SYSTEM + "}/{" + PAR_ID + "}";
+	public static final String URL_ATTRIBUTES_ATTRNAME_QUERY = "/{" + PAR_ORGANISM + "}/attributes/{" + PAR_SYSTEM + "}/{" + PAR_ID + "}/"+PAR_TARGET_ATTR_NAME;
 	public static final String URL_ATTRIBUTE_SET = "/{" + PAR_ORGANISM + "}/attributeSet";
 	public static final String URL_ATTRIBUTE_SEARCH_WITH_LIMIT_ATTR_NAME =  "/{" + PAR_ORGANISM + "}/attributeSearch/{" + PAR_QUERY + "}/{"+PAR_TARGET_LIMIT + "}/{"+PAR_TARGET_ATTR_NAME + "}";
 	public static final String URL_ATTRIBUTE_SEARCH_WITH_LIMIT = "/{" + PAR_ORGANISM + "}/attributeSearch/{" + PAR_QUERY + "}/{"+PAR_TARGET_LIMIT + "}";
@@ -53,11 +52,16 @@ public class RestletService extends Application{
 	public static final String URL_CONFIG = "/config";
 	public static final String URL_CONTENTS = "/contents";
 	public static final String URL_NO_MATCH = "/{" + PAR_ORGANISM + "}";
-	public static final String URL_XREFS = "/{" + PAR_ORGANISM + "}/xrefs/{" + PAR_SYSTEM + "}/{" + PAR_ID + "}";
-	public static final String URL_SEARCH = "/{" + PAR_ORGANISM + "}/search/{" + PAR_QUERY + "}";
-	public static final String URL_XREF_EXISTS = "/{" + PAR_ORGANISM + "}/xrefExists/{" + PAR_SYSTEM + "}/{" + PAR_ID + "}";
 	public static final String URL_HOME = "/";
-	public static final String URL_BACK_PAGE_TEXT = "/{" + PAR_ORGANISM + "}/backPageText/{" + PAR_SYSTEM + "}/{" + PAR_ID + "}";
+	public static final String URL_SEARCH = "/{" + PAR_ORGANISM + "}/search/{" + PAR_QUERY + "}";
+	public static final String URL_SEARCH_LIMIT = "/{" + PAR_ORGANISM + "}/search/{" + PAR_QUERY + "}/{"+PAR_TARGET_LIMIT + "}";
+	public static final String URL_XREFS = "/{" + PAR_ORGANISM + "}/xrefs/{" + PAR_SYSTEM + "}/{" + PAR_ID + "}";
+	public static final String URL_XREFS_TARGET = "/{" + PAR_ORGANISM + "}/xrefs/{" + PAR_SYSTEM + "}/{" + PAR_ID + "}/{" + PAR_TARGET_SYSTEM + "}";
+	public static final String URL_XREF_EXISTS = "/{" + PAR_ORGANISM + "}/xrefExists/{" + PAR_SYSTEM + "}/{" + PAR_ID + "}";
+	public static final String URL_XREFS_BATCH = "/{" + PAR_ORGANISM + "}/xrefsBatch";
+	public static final String URL_XREFS_BATCH_TARGETDS_QUERY = "/{" + PAR_ORGANISM + "}/xrefsBatch/targetDs";
+	public static final String URL_XREFS_BATCH_SOURCE_TARGETDS_QUERY = "/{" + PAR_ORGANISM + "}/xrefsBatch/{" + PAR_SYSTEM +"}/"+PAR_TARGET_SYSTEM;
+	public static final String URL_XREFS_BATCH_SOURCE = "/{" + PAR_ORGANISM + "}/xrefsBatch/{" + PAR_SYSTEM +"}";
 
 	private GdbProvider gdbProvider;
 	
@@ -93,34 +97,54 @@ public class RestletService extends Application{
         Router router = new Router(getContext());
         Redirector redirector = new Redirector(getContext(), URL_ATTRIBUTE_SEARCH, Redirector.MODE_CLIENT_TEMPORARY);
         Extractor extractor = new Extractor(getContext(), redirector); 
-        Extractor extractorAttributeName= new Extractor(getContext()); 
+        		
         TemplateRoute route = router.attach (URL_PROPERTIES, Properties.class );
 
         router.attach(URL_DATASOURCES, DataSources.class);
         
 		/* AttributeMapper methods */
         router.attach(URL_ATTRIBUTE_SET, AttributeSet.class);
-
-		//Route attrSearchRoute = router.attach( URL_ATTRIBUTE_SEARCH, AttributeSearch.class );
-	    //extractor.extractFromEntity(PAR_TARGET_LIMIT,PAR_TARGET_LIMIT, true);
-	   // extractor.extractFromEntity(PAR_TARGET_ATTR_NAME,PAR_TARGET_ATTR_NAME, true);
         
         Route attrSearchRoute = router.attach(URL_ATTRIBUTE_SEARCH, AttributeSearch.class);
         router.attach(URL_ATTRIBUTE_SEARCH_WITH_LIMIT, AttributeSearch.class);
         router.attach(URL_ATTRIBUTE_SEARCH_WITH_LIMIT_ATTR_NAME, AttributeSearch.class);
-       // extractor.extractFromQuery(PAR_QUERY, PAR_QUERY, true);
-	   // router.attach("/{" + PAR_ORGANISM + "}/attributeSearch/",AttributeSearch.class);
-        //router.attach("/{" + PAR_ORGANISM + "}/attributeSearch/",extractor);
-        //extractor.setNext(AttributeSearch.class);
-        //router.attach("/attributeSearch", extractor);
-		//extractorAttributeName.extractFromEntity( PAR_TARGET_ATTR_NAME, PAR_TARGET_ATTR_NAME, true );
+        
 		Route attributesRoute = router.attach(URL_ATTRIBUTES, Attributes.class );
-		//router.attach("/{" + PAR_ORGANISM + "}/attributeSearch/",extractorAttributeName);
-		//extractorAttributeName.setNext(Attributes.class);
+		
+        Extractor extractorAttributes = new Extractor(getContext()); 
+        extractorAttributes.extractFromQuery(PAR_TARGET_ATTR_NAME, PAR_TARGET_ATTR_NAME, true);
+        extractorAttributes.setNext(Attributes.class);
+        
+        router.attach(URL_ATTRIBUTES_ATTRNAME_QUERY, extractorAttributes);
+
+		
 		router.attach(URL_SUPPORTED_SOURCE_DATASOURCES, SupportedSourceDataSources.class );
 		router.attach(URL_SUPPORTED_TARGET_DATASOURCES, SupportedTargetDataSources.class );
 		router.attach(URL_IS_FREE_SEARCH_SUPPORTED, IsFreeSearchSupported.class );
 		router.attach(URL_IS_MAPPING_SUPPORTED, IsMappingSupported.class );
+				
+		//Register the route for the xrefs url pattern
+		Route xrefsRoute = router.attach(URL_XREFS, Xrefs.class);
+		router.attach(URL_XREFS_TARGET, Xrefs.class);
+		router.attach(URL_XREF_EXISTS, XrefExists.class);
+
+        Extractor extractorBatch = new Extractor(getContext()); 
+        extractorBatch.extractFromQuery(PAR_TARGET_SYSTEM, PAR_TARGET_SYSTEM, true);
+        extractorBatch.setNext(Batch.class);
+        
+        router.attach(URL_XREFS_BATCH_TARGETDS_QUERY, extractorBatch);
+        router.attach(URL_XREFS_BATCH_SOURCE_TARGETDS_QUERY, extractorBatch);
+		
+		router.attach(URL_XREFS_BATCH_SOURCE,Batch.class);
+		router.attach(URL_XREFS_BATCH,Batch.class);
+
+		
+		Route searchRoute = router.attach( URL_SEARCH, FreeSearch.class );
+		router.attach( URL_SEARCH_LIMIT, FreeSearch.class );
+		
+		router.attach(URL_CONFIG, Config.class);
+		router.attach(URL_CONTENTS, Contents.class);
+		router.attach(URL_NO_MATCH, NoMatch.class);
 		
         Filter preferencesFilter = new Filter(getContext()) {
             protected int beforeHandle(Request request, Response response) {

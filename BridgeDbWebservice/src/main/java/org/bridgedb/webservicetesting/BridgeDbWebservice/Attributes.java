@@ -54,13 +54,12 @@ public class Attributes extends RestletResource {
 	}
 	
 	private Representation getAttributesWithType(Variant variant) throws IDMapperException {
-		System.out.println("variant: " + variant);
 		if(MediaType.APPLICATION_JSON.isCompatible(variant.getMediaType())){
 			IDMapperStack mapper = getIDMappers();
 			JSONObject jsonObject = new JSONObject();
 			Set<String> values = mapper.getAttributes(xref, attrType);
 			for(String v : values) {
-				jsonObject.put("attribute",v);
+				jsonObject.put(attrType,v);
 			}
 			return new StringRepresentation(jsonObject.toString());
 		}
