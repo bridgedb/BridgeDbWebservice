@@ -56,14 +56,14 @@ public class Xrefs extends RestletResource{
 			if(MediaType.APPLICATION_JSON.isCompatible(variant.getMediaType())){
 		        JSONObject jsonObject = new JSONObject();
 				for(Xref x : xrefs) {
-					jsonObject.put(x.getId(), x.getDataSource().getFullName());
+					jsonObject.put(x.getBioregistryIdentifier(), x.getDataSource().getFullName());
 				}
 				return new StringRepresentation(jsonObject.toString());
 			}
 			else {
 			StringBuilder result = new StringBuilder();
 			for(Xref x : xrefs) {
-				result.append(x.getId());
+				result.append(x.getBioregistryIdentifier());
 				result.append("\t");
 				result.append(x.getDataSource().getFullName());
 				result.append("\n");

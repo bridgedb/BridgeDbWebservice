@@ -55,9 +55,7 @@ public class Batch extends RestletResource {
 			String postBody = entity.getText();
 			String[] splitXrefs = postBody.split("\n");
 			IDMapper mapper = getIDMappers();
-			for (String xref : splitXrefs) {
-				System.out.println("xref: " + xref);
-			}
+			
 
 			if (MediaType.APPLICATION_JSON.isCompatible(variant.getMediaType())) {
 				JSONObject jsonObject = new JSONObject();
@@ -83,7 +81,7 @@ public class Batch extends RestletResource {
 					} else {
 						Iterator<Xref> iter = xrefs.iterator();
 						while (iter.hasNext()) {
-							resultSet.add(iter.next());
+							resultSet.add(iter.next().getBioregistryIdentifier());
 						}
 						mappedXrefsJson.put("result set", resultSet);
 						mappedXrefsJson.put("datasource", ds.getFullName());
@@ -119,7 +117,7 @@ public class Batch extends RestletResource {
 						Iterator<Xref> iter = xrefs.iterator();
 						result.append(iter.next());
 						while (iter.hasNext()) {
-							result.append("," + iter.next());
+							result.append("," + iter.next().getBioregistryIdentifier());
 						}
 						result.append("\n");
 					}

@@ -1,5 +1,6 @@
 package org.bridgedb.webservicetesting.BridgeDbWebservice;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,12 +24,11 @@ public class AttributeSet extends RestletResource {
 			Set<String> attributes = stack.getAttributeSet();
 			if (MediaType.APPLICATION_JSON.isCompatible(variant.getMediaType())) {
 				JSONObject jsonObject = new JSONObject();
-				int i = attributes.size();
+				ArrayList resultSet = new ArrayList<>();
 				for (String a : attributes) {
-					System.out.println(a);
-					jsonObject.put("attribute "+ Integer.toString(i) +" :", a);
-					i--;
+					resultSet.add(a);
 				}
+				jsonObject.put("attributes", resultSet);
 				return new StringRepresentation(jsonObject.toString());
 			} else {
 				StringBuilder result = new StringBuilder();
