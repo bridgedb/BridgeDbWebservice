@@ -37,7 +37,7 @@ public class RestletServer {
 			int port = 8080; // default port
 			boolean transitive = false;
 			//File configFile = null;
-			File configFile = new File("C:/Users/Helena/Documents/Projects/BridgeDb/Webservice/gdb.config");
+			File configFile = new File("./gdb.config");
 					    
 			RestletServer server = new RestletServer();
 			

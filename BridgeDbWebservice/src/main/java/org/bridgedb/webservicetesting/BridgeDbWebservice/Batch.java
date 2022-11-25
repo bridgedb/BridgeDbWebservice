@@ -20,7 +20,6 @@ public class Batch extends RestletResource {
 
 	private DataSource sourceDs;
 	private DataSource targetDs;
-	//private DataSource targetDsQuery;
 
 	protected void doInit() throws ResourceException {
 		super.doInit();
@@ -56,7 +55,6 @@ public class Batch extends RestletResource {
 			String[] splitXrefs = postBody.split("\n");
 			IDMapper mapper = getIDMappers();
 			
-
 			if (MediaType.APPLICATION_JSON.isCompatible(variant.getMediaType())) {
 				JSONObject jsonObject = new JSONObject();
 				for (String line : splitXrefs) {
