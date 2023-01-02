@@ -43,7 +43,5 @@ Point your browser to:
 
 http://localhost:8080/Human/attributeSet
 
-You should expect to see something like:
-
 
 Please see [Swagger Documentation](https://bridgedb.github.io/swagger/#/Identifiers%20(Genes%2C%20proteins%2C%20metabolites%2C%20interactions)/get__organism__properties) for your reference to see which endpoints are available for you to use.
