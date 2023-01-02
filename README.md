@@ -1,3 +1,5 @@
+[![build](https://github.com/bridgedb/BridgeDbWebservice/actions/workflows/build.yml/badge.svg)](https://github.com/bridgedb/BridgeDbWebservice/actions/workflows/build.yml)
+
 # BridgeDb Webservice 2.0
 
 The BridgeDb Webservice provides a REST service to access identifier mapping data. It uses the [BridgeDb Java library](https://github.com/bridgedb/bridgedb) and RESTlet technologies to make the webservice available. 
