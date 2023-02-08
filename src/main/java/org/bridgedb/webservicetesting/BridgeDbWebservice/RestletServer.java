@@ -35,8 +35,11 @@ public class RestletServer {
 	 public static void main(String[] args) throws Exception {
 			Class.forName ("org.bridgedb.rdb.IDMapperRdb");
 			int port = 8080; // default port
+			if(args[0] != null) {
+				port = Integer. parseInt(args[0]);
+			}
 			boolean transitive = false;
-			//File configFile = null;
+
 			File configFile = new File("./gdb.config");
 					    
 			RestletServer server = new RestletServer();
