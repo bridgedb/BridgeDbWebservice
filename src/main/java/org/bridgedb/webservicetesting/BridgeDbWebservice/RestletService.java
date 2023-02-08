@@ -20,8 +20,7 @@ import org.restlet.routing.TemplateRoute;
 
 public class RestletService extends Application{
 	
-	//public static final String CONF_GDBS = "gdb.config";
-	public static final String CONF_GDBS = "C:/Users/Helena/Documents/Projects/BridgeDb/Webservice/gdb.config";
+	public static final String CONF_GDBS = "gdb.config";
 	public static final String PAR_ORGANISM = "organism";
 	public static final String PAR_ID = "id";
 	public static final String PAR_SYSTEM = "system";
@@ -43,9 +42,6 @@ public class RestletService extends Application{
 	public static final String URL_ATTRIBUTES = "/{" + PAR_ORGANISM + "}/attributes/{" + PAR_SYSTEM + "}/{" + PAR_ID + "}";
 	public static final String URL_ATTRIBUTES_ATTRNAME_QUERY = "/{" + PAR_ORGANISM + "}/attributes/{" + PAR_SYSTEM + "}/{" + PAR_ID + "}/"+PAR_TARGET_ATTR_NAME;
 	public static final String URL_ATTRIBUTE_SET = "/{" + PAR_ORGANISM + "}/attributeSet";
-	//public static final String URL_ATTRIBUTE_SEARCH_WITH_LIMIT_ATTR_NAME =  "/{" + PAR_ORGANISM + "}/attributeSearch/{" + PAR_QUERY + "}/"+PAR_TARGET_LIMIT + "&"+PAR_TARGET_ATTR_NAME;
-	//public static final String URL_ATTRIBUTE_SEARCH_WITH_ATTR_NAME =  "/{" + PAR_ORGANISM + "}/attributeSearch/{" + PAR_QUERY + "}/"+PAR_TARGET_ATTR_NAME;
-	//public static final String URL_ATTRIBUTE_SEARCH_WITH_LIMIT = "/{" + PAR_ORGANISM + "}/attributeSearch/{" + PAR_QUERY + "}/"+PAR_TARGET_LIMIT;
 	public static final String URL_ATTRIBUTE_SEARCH_PARAMS ="/{" + PAR_ORGANISM + "}/attributeSearch/{" + PAR_QUERY + "}/"+ PAR_PARAMS;
 	public static final String URL_ATTRIBUTE_SEARCH = "/{" + PAR_ORGANISM + "}/attributeSearch/{" + PAR_QUERY + "}";
 	public static final String URL_SUPPORTED_SOURCE_DATASOURCES = "/{" + PAR_ORGANISM + "}/sourceDataSources";
@@ -114,9 +110,6 @@ public class RestletService extends Application{
 
         Route attrSearchRoute = router.attach(URL_ATTRIBUTE_SEARCH, AttributeSearch.class);
         router.attach(URL_ATTRIBUTE_SEARCH_PARAMS, extractorAttributeSearch);
-       // router.attach(URL_ATTRIBUTE_SEARCH_WITH_LIMIT, extractorAttributeSearch);
-       // router.attach(URL_ATTRIBUTE_SEARCH_WITH_ATTR_NAME, extractorAttributeSearch);
-        //router.attach(URL_ATTRIBUTE_SEARCH_WITH_LIMIT_ATTR_NAME, extractorAttributeSearch);
         
 		Route attributesRoute = router.attach(URL_ATTRIBUTES, Attributes.class );
 		

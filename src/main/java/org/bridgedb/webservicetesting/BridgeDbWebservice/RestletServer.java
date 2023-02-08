@@ -35,7 +35,7 @@ public class RestletServer {
 	 public static void main(String[] args) throws Exception {
 			Class.forName ("org.bridgedb.rdb.IDMapperRdb");
 			int port = 8080; // default port
-			if(args[0] != null) {
+			if(args.length != 0) {
 				port = Integer. parseInt(args[0]);
 			}
 			boolean transitive = false;
