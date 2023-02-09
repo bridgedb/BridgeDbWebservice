@@ -2,6 +2,8 @@ package org.bridgedb.webservicetesting.BridgeDbWebservice;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
 
 import org.bridgedb.IDMapperException;
 import org.bridgedb.bio.DataSourceTxt;
@@ -17,6 +19,7 @@ import org.restlet.routing.Redirector;
 import org.restlet.routing.Route;
 import org.restlet.routing.Router;
 import org.restlet.routing.TemplateRoute;
+import org.restlet.service.CorsService;
 
 public class RestletService extends Application{
 	
@@ -82,6 +85,12 @@ public class RestletService extends Application{
 			System.err.println ("Please copy org.bridgedb.server/gdb.config.template and adjust it to your needs");
 			System.exit(1);
 		}
+		
+		CorsService corsService = new CorsService();         
+       		corsService.setAllowedOrigins( new HashSet(Arrays.asList("*")));
+        	corsService.setAllowedCredentials(true);
+
+        	this.getServices().add( corsService );  
 	}
 	
 	public synchronized void start() throws Exception {
