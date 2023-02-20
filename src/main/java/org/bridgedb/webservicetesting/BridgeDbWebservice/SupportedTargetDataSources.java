@@ -16,6 +16,12 @@ public class SupportedTargetDataSources extends RestletResource {
 
 	@Get("json")
 	public Representation get(Variant variant) {
+    	if (!supportedOrganism(urlDecode((String) getRequest().getAttributes().get(RestletService.PAR_ORGANISM)))) {
+			String error = UNSUPPORTED_ORGANISM_TEMPLATE.replaceAll("%%ORGANISM%%", (String) getRequest().getAttributes().get(RestletService.PAR_ORGANISM));
+			StringRepresentation sr = new StringRepresentation(error);
+			sr.setMediaType(MediaType.TEXT_HTML);
+			return sr;
+    	}
 		try {
 			IDMapper mapper = getIDMappers();
 			if (MediaType.APPLICATION_JSON.isCompatible(variant.getMediaType())) {

@@ -1,12 +1,5 @@
 package org.bridgedb.webservicetesting.BridgeDbWebservice;
 
-import org.restlet.resource.ResourceException;
-import org.restlet.resource.ServerResource;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.HashMap;
@@ -16,12 +9,7 @@ import org.bridgedb.DataSource;
 import org.bridgedb.IDMapperStack;
 import org.bridgedb.bio.Organism;
 import org.bridgedb.rdb.GdbProvider;
-import org.json.simple.JSONObject;
-import org.restlet.data.MediaType;
-import org.restlet.representation.Representation;
-import org.restlet.representation.StringRepresentation;
-import org.restlet.resource.Delete;
-import org.restlet.resource.Get;
+import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 
 public class RestletResource extends ServerResource {
@@ -34,8 +22,18 @@ public class RestletResource extends ServerResource {
     }
     */
 	private IDMapperStack mappers;
-	private String orgName;
 	
+	protected static String UNSUPPORTED_ORGANISM_TEMPLATE = "<html>\n"
+			+ "<head>\n"
+			+ "   <title>Status page</title>\n"
+			+ "</head>\n"
+			+ "<body style=\"font-family: sans-serif;\">\n"
+			+ "<h3>Unknown organism: %%ORGANISM%%<p><font size='+1'><i>Double check the spelling. We are expecting an entry like: Human</i></font></p></h3><p>You can get technical details <a href=\"http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1\">here</a>.<br>\n"
+			+ "Please continue your visit at our <a href=\"/\">home page</a>.\n"
+			+ "</p>\n"
+			+ "</body>\n"
+			+ "</html>\n";
+
 	protected DataSource parseDataSource(String dsName) {
 		if(dsName == null) return null;
 		DataSource ds = null;
@@ -51,7 +49,7 @@ public class RestletResource extends ServerResource {
 	protected void doInit() throws ResourceException {
 		try {
 		
-		orgName = urlDecode(
+		String orgName = urlDecode(
 				(String) getRequest().getAttributes().get(RestletService.PAR_ORGANISM)
 				);
 		String requestedID = urlDecode(
@@ -71,36 +69,45 @@ public class RestletResource extends ServerResource {
 			}
 		}
 		
-		initIDMappers();
-		} catch(UnsupportedEncodingException e) {
-			throw new ResourceException(e);
+		initIDMappers(orgName);
+		} catch(IllegalArgumentException e) {
+			if (e.getMessage().contains("Unknown organism")) return; // ignore for now
 		}
 	}
 	 
-	 protected String urlDecode(String string) throws UnsupportedEncodingException {
-		 	System.out.println("decoding url: "+string);
-			return string == null ? null : URLDecoder.decode(string, "UTF-8");
-		}
-		
-		private void initIDMappers() {
-			//System.out.println(orgName);
-			Organism org = Organism.fromLatinName(orgName);
-			if(org == null) { //Fallback on code
-				org = Organism.fromCode(orgName);
-			}
-			if(org == null) { //Fallback on shortname
-				org = Organism.fromShortName(orgName);
-			}
-			if(org == null) {
-				throw new IllegalArgumentException("Unknown organism: " + orgName + "<p><font size='+1'><i>Double check the spelling. We are expecting an entry like: Human</i></font></p>");
-			}
-			System.out.println(org);
-			mappers = getGdbProvider().getStack(org);
-			if (mappers.getSize() == 0)
-			{
-				throw new IllegalArgumentException("No database found for: " + orgName +"<p><font size='+1'><i>Verify that the database is supported and properly referenced in gdb.config.</i></font></p>");
-			}
-		}
+	 protected String urlDecode(String string) {
+		 System.out.println("decoding url: "+string);
+		 if (string == null) return null;
+		 try {
+			string = URLDecoder.decode(string, "UTF-8");
+		 } catch (UnsupportedEncodingException e) {}
+		 return string;
+	 }
+
+	 protected Organism findOrganism(String orgName) {
+		 Organism org = Organism.fromLatinName(orgName);
+		 if (org == null) { org = Organism.fromCode(orgName); } //Fallback on code
+		 if (org == null) { org = Organism.fromShortName(orgName); } //Fallback on shortname
+		 return org;
+	 }
+
+	 protected boolean supportedOrganism(String orgName) {
+		 return findOrganism(orgName) != null;
+	 }
+
+	 private void initIDMappers(String orgName) {
+		 Organism org = findOrganism(orgName);
+		 if(org == null) {
+			 throw new IllegalArgumentException("Unknown organism: " + orgName + "<p><font size='+1'><i>Double check the spelling. We are expecting an entry like: Human</i></font></p>");
+		 }
+		 System.out.println(org);
+		 mappers = getGdbProvider().getStack(org);
+		 if (mappers.getSize() == 0)
+		 {
+			 throw new IllegalArgumentException("No database found for: " + orgName +"<p><font size='+1'><i>Verify that the database is supported and properly referenced in gdb.config.</i></font></p>");
+		 }
+	 }
+
 		protected IDMapperStack getIDMappers() {
 			return mappers;
 		}

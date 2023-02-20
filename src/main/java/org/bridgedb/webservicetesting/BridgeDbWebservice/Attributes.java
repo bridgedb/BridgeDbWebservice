@@ -40,6 +40,12 @@ public class Attributes extends RestletResource {
 	}
 	@Get("json")
 	public Representation getAttributes(Variant variant) {
+    	if (!supportedOrganism(urlDecode((String) getRequest().getAttributes().get(RestletService.PAR_ORGANISM)))) {
+			String error = UNSUPPORTED_ORGANISM_TEMPLATE.replaceAll("%%ORGANISM%%", (String) getRequest().getAttributes().get(RestletService.PAR_ORGANISM));
+			StringRepresentation sr = new StringRepresentation(error);
+			sr.setMediaType(MediaType.TEXT_HTML);
+			return sr;
+    	}
 		try {
 			if(attrType != null) {
 				return getAttributesWithType(variant);

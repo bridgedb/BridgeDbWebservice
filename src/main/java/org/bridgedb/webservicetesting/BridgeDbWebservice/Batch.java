@@ -38,6 +38,12 @@ public class Batch extends RestletResource {
 
 	@Post("json")
 	public Representation post(Representation entity, Variant variant) {
+    	if (!supportedOrganism(urlDecode((String) getRequest().getAttributes().get(RestletService.PAR_ORGANISM)))) {
+			String error = UNSUPPORTED_ORGANISM_TEMPLATE.replaceAll("%%ORGANISM%%", (String) getRequest().getAttributes().get(RestletService.PAR_ORGANISM));
+			StringRepresentation sr = new StringRepresentation(error);
+			sr.setMediaType(MediaType.TEXT_HTML);
+			return sr;
+    	}
 		Representation result = new StringRepresentation("");
 		if (sourceDs != null) {
 			result = oneDataSource(entity, variant);
@@ -48,6 +54,12 @@ public class Batch extends RestletResource {
 	}
 
 	public Representation multiDataSource(Representation entity, Variant variant) {
+    	if (!supportedOrganism(urlDecode((String) getRequest().getAttributes().get(RestletService.PAR_ORGANISM)))) {
+			String error = UNSUPPORTED_ORGANISM_TEMPLATE.replaceAll("%%ORGANISM%%", (String) getRequest().getAttributes().get(RestletService.PAR_ORGANISM));
+			StringRepresentation sr = new StringRepresentation(error);
+			sr.setMediaType(MediaType.TEXT_HTML);
+			return sr;
+    	}
 		System.out.println("Batch Multi Xrefs.getXrefs() start");
 		try {
 			// The result set

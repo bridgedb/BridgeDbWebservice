@@ -44,7 +44,14 @@ public class Xrefs extends RestletResource{
 	
 	@Get("json")
 	public Representation get(Variant variant) {
-		System.out.println( "Xrefs.getXrefs() start" );
+    	if (!supportedOrganism(urlDecode((String) getRequest().getAttributes().get(RestletService.PAR_ORGANISM)))) {
+			String error = UNSUPPORTED_ORGANISM_TEMPLATE.replaceAll("%%ORGANISM%%", (String) getRequest().getAttributes().get(RestletService.PAR_ORGANISM));
+			StringRepresentation sr = new StringRepresentation(error);
+			sr.setMediaType(MediaType.TEXT_HTML);
+			return sr;
+    	}
+
+    	System.out.println( "Xrefs.getXrefs() start" );
 		try {
 			//The result set
 			IDMapper mapper = getIDMappers();

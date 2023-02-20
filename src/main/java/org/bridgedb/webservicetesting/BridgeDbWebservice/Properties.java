@@ -10,13 +10,17 @@ import org.restlet.representation.StringRepresentation;
 import org.restlet.representation.Variant;
 import org.restlet.resource.Get;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 public class Properties extends RestletResource{
     
     @Get("json")
 	public Representation get(Variant variant) {
+    	if (!supportedOrganism(urlDecode((String) getRequest().getAttributes().get(RestletService.PAR_ORGANISM)))) {
+			String error = UNSUPPORTED_ORGANISM_TEMPLATE.replaceAll("%%ORGANISM%%", (String) getRequest().getAttributes().get(RestletService.PAR_ORGANISM));
+			StringRepresentation sr = new StringRepresentation(error);
+			sr.setMediaType(MediaType.TEXT_HTML);
+			return sr;
+    	}
+    	
 		if(MediaType.APPLICATION_JSON.isCompatible(variant.getMediaType())){
 			try
 			{
