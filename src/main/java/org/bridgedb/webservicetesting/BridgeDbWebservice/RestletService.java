@@ -85,7 +85,9 @@ public class RestletService extends Application{
 			System.err.println ("Please copy org.bridgedb.server/gdb.config.template and adjust it to your needs");
 			System.exit(1);
 		}
-		
+
+		this.getMetadataService().setDefaultMediaType(MediaType.TEXT_PLAIN);
+
 		CorsService corsService = new CorsService();         
        		corsService.setAllowedOrigins( new HashSet(Arrays.asList("*")));
         	corsService.setAllowedCredentials(true);
