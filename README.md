@@ -1,6 +1,6 @@
 [![build](https://github.com/bridgedb/BridgeDbWebservice/actions/workflows/build.yml/badge.svg)](https://github.com/bridgedb/BridgeDbWebservice/actions/workflows/build.yml)
 
-# BridgeDb Webservice 2.0
+# BridgeDb Webservice 2.x
 
 The BridgeDb Webservice provides a REST service to access identifier mapping data. It uses the [BridgeDb Java library](https://github.com/bridgedb/bridgedb) and RESTlet technologies to make the webservice available. 
 
@@ -36,14 +36,11 @@ When starting the webservice, the gdb.config file will be parsed to determine wh
 Navigating to the folder where you saved the jar file and run the following line:
 
 ```bash
-java -jar bridgedb-webservice-2.0.0.jar
+java -jar target/BridgeDbWebservice-*-jar-with-dependencies.jar
 ```
 
 ### Testing an endpoint
 
-Point your browser to:
-
-http://localhost:8080/Human/attributeSet
-
+Point your browser to: http://localhost:8080/Human/attributeSet
 
 Please see [Swagger Documentation](https://bridgedb.github.io/swagger/#/Identifiers%20(Genes%2C%20proteins%2C%20metabolites%2C%20interactions)/get__organism__properties) for your reference to see which endpoints are available for you to use.
