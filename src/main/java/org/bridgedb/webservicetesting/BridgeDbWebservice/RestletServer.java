@@ -36,7 +36,7 @@ public class RestletServer {
 			int port = 8080; // default port
 			boolean cors = true;
 			if(args.length > 0) port = Integer. parseInt(args[0]);
-			if(args.length > 1) cors = "false".equals(args[1]);
+			if(args.length > 1) cors = !("false".equals(args[1]));
 			boolean transitive = false;
 
 			File configFile = new File("./gdb.config");
