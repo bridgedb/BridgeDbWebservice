@@ -55,6 +55,7 @@ public class RestletService extends Application{
 	public static final String URL_CONTENTS = "/contents";
 	public static final String URL_NO_MATCH = "/{" + PAR_ORGANISM + "}";
 	public static final String URL_HOME = "/";
+	public static final String URL_FAVICON = "/favicon.ico";
 	public static final String URL_SEARCH = "/{" + PAR_ORGANISM + "}/search/{" + PAR_QUERY + "}";
 	public static final String URL_SEARCH_LIMIT = "/{" + PAR_ORGANISM + "}/search/{" + PAR_QUERY + "}/{"+PAR_TARGET_LIMIT + "}";
 	public static final String URL_XREFS = "/{" + PAR_ORGANISM + "}/xrefs/{" + PAR_SYSTEM + "}/{" + PAR_ID + "}";
@@ -108,8 +109,10 @@ public class RestletService extends Application{
     public Restlet createInboundRoot() {
         System.out.println("Creating the root");
         Router router = new Router(getContext());
-        Redirector redirector = new Redirector(getContext(), URL_ATTRIBUTE_SEARCH, Redirector.MODE_CLIENT_TEMPORARY);
-        		
+		router.attach(URL_FAVICON, Favicon.class);
+
+		Redirector redirector = new Redirector(getContext(), URL_ATTRIBUTE_SEARCH, Redirector.MODE_CLIENT_TEMPORARY);
+
         TemplateRoute route = router.attach (URL_PROPERTIES, Properties.class );
 
         router.attach(URL_DATASOURCES, DataSources.class);
