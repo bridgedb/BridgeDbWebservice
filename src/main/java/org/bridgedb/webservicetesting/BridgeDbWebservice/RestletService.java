@@ -67,7 +67,7 @@ public class RestletService extends Application{
 
 	private GdbProvider gdbProvider;
 	
-	public RestletService(File aConfigFile, boolean transitive)
+	public RestletService(File aConfigFile, boolean transitive, boolean cors)
 	{
 		this.transitive = transitive;
 		if (aConfigFile == null)
@@ -88,11 +88,13 @@ public class RestletService extends Application{
 
 		this.getMetadataService().setDefaultMediaType(MediaType.TEXT_PLAIN);
 
-		CorsService corsService = new CorsService();         
+		if (cors) {
+			CorsService corsService = new CorsService();
        		corsService.setAllowedOrigins( new HashSet(Arrays.asList("*")));
         	corsService.setAllowedCredentials(true);
 
-        	this.getServices().add( corsService );  
+            this.getServices().add( corsService );
+		}
 	}
 	
 	public synchronized void start() throws Exception {
