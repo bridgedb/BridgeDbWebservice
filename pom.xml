@@ -23,7 +23,7 @@
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
     <restlet-version>2.3.7</restlet-version>
-    <bridgedb-version>3.0.19</bridgedb-version>
+    <bridgedb-version>3.0.20-SNAPSHOT</bridgedb-version>
   </properties>
 
   <dependencies>
