@@ -19,16 +19,19 @@ public class Config extends ServerResource {
 		try {
 			Properties props = new Properties();
 			props.load(BridgeDb.class.getClassLoader().getResourceAsStream("version.props"));
+			props.load(RestletServer.class.getClassLoader().getResourceAsStream("webservice.props"));
 
 			if (MediaType.APPLICATION_JSON.isCompatible(variant.getMediaType())) {
 		        JSONObject jsonObject = new JSONObject();
 		        jsonObject.put("java.version", System.getProperty("java.version"));
 		        jsonObject.put("bridgedb.version", props.getProperty("bridgedb.version"));
+		        jsonObject.put("webservice.version", props.getProperty("webservice.version"));
 		        return new StringRepresentation(jsonObject.toString());
 			} else {
 				StringBuilder result = new StringBuilder();
 				result.append("java.version\t" + System.getProperty("java.version") + "\n");
 				result.append("bridgedb.version\t" + props.getProperty("bridgedb.version") + "\n");
+				result.append("webservice.version\t" + props.getProperty("webservice.version") + "\n");
 				return new StringRepresentation(result.toString());
 			}
 		} catch (Exception e) {
