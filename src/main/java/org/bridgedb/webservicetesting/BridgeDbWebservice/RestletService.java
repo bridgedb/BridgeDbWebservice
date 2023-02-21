@@ -89,6 +89,7 @@ public class RestletService extends Application{
 		this.getMetadataService().setDefaultMediaType(MediaType.TEXT_PLAIN);
 
 		if (cors) {
+			System.out.println("Setting up CORS to * ...");
 			CorsService corsService = new CorsService();
        		corsService.setAllowedOrigins( new HashSet(Arrays.asList("*")));
         	corsService.setAllowedCredentials(true);
