@@ -1,3 +1,4 @@
+[![DOI](https://zenodo.org/badge/546656929.svg)](https://zenodo.org/badge/latestdoi/546656929)
 [![build](https://github.com/bridgedb/BridgeDbWebservice/actions/workflows/build.yml/badge.svg)](https://github.com/bridgedb/BridgeDbWebservice/actions/workflows/build.yml)
 
 # BridgeDb Webservice 2.x
