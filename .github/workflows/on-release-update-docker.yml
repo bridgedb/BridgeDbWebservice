@@ -1,0 +1,14 @@
+name: Update Docker image
+on:
+  release:
+  
+jobs:
+  trigger-docker-update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger docker release
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.pat_external_workflow }}
+          repository: jmillanacosta/docker
+          event-type: update-event
