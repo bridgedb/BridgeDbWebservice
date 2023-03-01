@@ -1,6 +1,8 @@
 name: Update Docker image
 on:
   release:
+    #types: [published]
+
   
 jobs:
   trigger-docker-update:
