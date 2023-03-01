@@ -1,0 +1,16 @@
+name: Update Docker image
+on:
+  release:
+    #types: [published]
+
+  
+jobs:
+  trigger-docker-update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger docker release
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.pat_external_workflow }}
+          repository: bridgedb/docker
+          event-type: update-event
