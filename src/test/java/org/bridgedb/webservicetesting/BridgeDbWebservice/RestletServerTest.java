@@ -25,6 +25,7 @@ import java.net.URLConnection;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class RestletServerTest {
@@ -72,6 +73,30 @@ public class RestletServerTest {
         input.transferTo(buffer);
         String reply = buffer.toString();
         Assert.assertTrue(reply.contains("DATASOURCENAME"));
+    }
+
+    @Test
+    public void testSources() throws Exception {
+        URL queryURL = new URL("http://127.0.0.1:" + port + "/Human/sourceDataSources");
+        URLConnection connection = queryURL.openConnection();
+        InputStream input = connection.getInputStream();
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        input.transferTo(buffer);
+        String reply = buffer.toString();
+        System.out.println(reply);
+        Assert.assertTrue(reply.contains("Wikidata"));
+    }
+
+    @Test
+    public void testTargets() throws Exception {
+        URL queryURL = new URL("http://127.0.0.1:" + port + "/Human/targetDataSources");
+        URLConnection connection = queryURL.openConnection();
+        InputStream input = connection.getInputStream();
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        input.transferTo(buffer);
+        String reply = buffer.toString();
+        System.out.println(reply);
+        Assert.assertTrue(reply.contains("Wikidata"));
     }
 
 }
