@@ -13,8 +13,11 @@
 // limitations under the License.
 package org.bridgedb.webservicetesting.BridgeDbWebservice;
 
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
@@ -30,9 +33,27 @@ public class RestletServerTest {
 	private static RestletServer server;
 
     @BeforeClass
-    public static void startServer() {
-        File configFile = new File("./gdb.config");
+    public static void startServer() throws IOException {
+        // set up a test Derby file
+        File derbyFile = File.createTempFile("bdb", "bridge");
+        derbyFile.deleteOnExit();
+        InputStream stream = RestletServerTest.class.getClassLoader().getResourceAsStream("humancorona-2021-11-27.bridge");
+        FileOutputStream derbyStream = new FileOutputStream(derbyFile);
+        stream.transferTo(derbyStream);
+        derbyStream.close();
+        stream.close();
 
+        // set up the GDB config file
+        File configFile = File.createTempFile("gdb", "config");
+        configFile.deleteOnExit();
+        FileOutputStream outputStream = new FileOutputStream(configFile);
+        BufferedOutputStream bufferStream = new BufferedOutputStream(outputStream);
+        String configFileContent = "*\t" +  derbyFile.getAbsolutePath();
+        bufferStream.write(configFileContent.getBytes());
+        bufferStream.close();
+        outputStream.close();
+
+        // set up the REST service
         RestletServerTest.server = new RestletServer();
         RestletServerTest.server.run(port, configFile, false, false);
     }
