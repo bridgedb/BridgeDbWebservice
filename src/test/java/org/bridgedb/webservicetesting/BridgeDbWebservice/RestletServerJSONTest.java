@@ -74,4 +74,11 @@ public class RestletServerJSONTest {
         Assert.assertTrue(sources.toList().contains("Wikidata"));
     }
 
+    @Test
+    public void testSources_UnknownSpecies() throws Exception {
+    	String reply =  TestHelper.getJSONContent("http://127.0.0.1:" + port + "/Catz/sourceDataSources");
+        Assert.assertTrue(reply.contains("<html>"));
+        Assert.assertTrue(reply.contains("Unknown organism"));
+    }
+
 }
