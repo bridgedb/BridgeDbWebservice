@@ -90,6 +90,7 @@ public class RestletServerTest {
     public void testXrefs() throws Exception {
     	String reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/Human/xrefs/Wd/Q90038963");
         Assert.assertTrue(reply.contains("Wikidata"));
+        Assert.assertTrue(reply.contains("P0DTD1-PRO_0000449625"));
     }
 
 }
