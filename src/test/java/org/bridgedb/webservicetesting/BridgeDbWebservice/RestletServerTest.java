@@ -78,4 +78,18 @@ public class RestletServerTest {
         Assert.assertTrue(reply.contains("Wikidata"));
     }
 
+    @Test
+    public void testXrefExists() throws Exception {
+    	String reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/Human/xrefExists/Wd/Q90038963");
+        Assert.assertTrue(reply.equals("true"));
+    	reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/Human/xrefExists/Wd/Q0");
+        Assert.assertTrue(reply.equals("false"));
+    }
+
+    @Test
+    public void testXrefs() throws Exception {
+    	String reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/Human/xrefs/Wd/Q90038963");
+        Assert.assertTrue(reply.contains("Wikidata"));
+    }
+
 }
