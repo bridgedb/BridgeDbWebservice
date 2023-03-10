@@ -6,7 +6,9 @@ import org.bridgedb.DataSource;
 import org.bridgedb.IDMapper;
 import org.bridgedb.Xref;
 import org.json.simple.JSONObject;
+import org.restlet.data.Form;
 import org.restlet.data.MediaType;
+import org.restlet.data.Parameter;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
@@ -51,6 +53,14 @@ public class Xrefs extends RestletResource{
 			return sr;
     	}
 
+    	String targetSystemCode = null;
+    	Form form = getRequest().getResourceRef().getQueryAsForm();
+        for (Parameter parameter : form) {
+    		if ("dataSource".equals(parameter.getName())) {
+    			targetSystemCode = parameter.getValue();
+    		}
+    	}
+    	
     	System.out.println( "Xrefs.getXrefs() start" );
 		try {
 			//The result set
@@ -63,19 +73,25 @@ public class Xrefs extends RestletResource{
 			if(MediaType.APPLICATION_JSON.isCompatible(variant.getMediaType())){
 		        JSONObject jsonObject = new JSONObject();
 				for(Xref x : xrefs) {
-					jsonObject.put(x.getBioregistryIdentifier(), x.getDataSource().getFullName());
+					if (targetSystemCode == null ||
+						targetSystemCode.equals(x.getDataSource().getSystemCode())) {
+						jsonObject.put(x.getBioregistryIdentifier(), x.getDataSource().getFullName());
+					}
 				}
 				return new StringRepresentation(jsonObject.toString());
 			}
 			else {
-			StringBuilder result = new StringBuilder();
-			for(Xref x : xrefs) {
-				result.append(x.getId());
-				result.append("\t");
-				result.append(x.getDataSource().getFullName());
-				result.append("\n");
-			}
-			return new StringRepresentation(result.toString());
+			    StringBuilder result = new StringBuilder();
+			    for(Xref x : xrefs) {
+			        if (targetSystemCode == null ||
+			        	targetSystemCode.equals(x.getDataSource().getSystemCode())) {
+			            result.append(x.getId());
+			            result.append("\t");
+			            result.append(x.getDataSource().getFullName());
+			            result.append("\n");
+			        }
+			    }
+			    return new StringRepresentation(result.toString());
 			}
 		} catch(Exception e) {
 			e.printStackTrace();
