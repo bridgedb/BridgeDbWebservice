@@ -70,7 +70,7 @@ public class Xrefs extends RestletResource{
 			else {
 			StringBuilder result = new StringBuilder();
 			for(Xref x : xrefs) {
-				result.append(x.getBioregistryIdentifier());
+				result.append(x.getId());
 				result.append("\t");
 				result.append(x.getDataSource().getFullName());
 				result.append("\n");
