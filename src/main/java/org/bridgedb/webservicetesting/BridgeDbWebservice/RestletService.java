@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 
+import org.bridgedb.DataSource;
 import org.bridgedb.IDMapperException;
 import org.bridgedb.bio.DataSourceTxt;
 import org.bridgedb.rdb.GdbProvider;
@@ -101,7 +102,7 @@ public class RestletService extends Application{
 	
 	public synchronized void start() throws Exception {
 		super.start();
-		DataSourceTxt.init();
+		if (!DataSource.systemCodeExists("S")) DataSourceTxt.init();
 		connectGdbs();
 	}
 	
