@@ -20,7 +20,7 @@ import java.net.URL;
 
 public class TestHelper {
 
-    public static String getContent(String url) throws Exception {
+    public static String getJSONContent(String url) throws Exception {
         URL queryURL = new URL(url);
         HttpURLConnection connection = (HttpURLConnection)queryURL.openConnection();
         connection.setRequestProperty("Accept", "application/json");
@@ -28,6 +28,20 @@ public class TestHelper {
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         input.transferTo(buffer);
         return buffer.toString();
+    }
+
+    public static String getPlainTextContent(String url) throws Exception {
+        URL queryURL = new URL(url);
+        HttpURLConnection connection = (HttpURLConnection)queryURL.openConnection();
+        connection.setRequestProperty("Accept", "text/plain");
+        InputStream input = connection.getInputStream();
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        input.transferTo(buffer);
+        return buffer.toString();
+    }
+
+    public static String getContent(String url) throws Exception {
+    	return getPlainTextContent(url);
     }
 
 }

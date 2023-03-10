@@ -65,7 +65,7 @@ public class RestletServerJSONTest {
 
     @Test
     public void testSources() throws Exception {
-    	String reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/Human/sourceDataSources");
+    	String reply =  TestHelper.getJSONContent("http://127.0.0.1:" + port + "/Human/sourceDataSources");
         Assert.assertTrue(reply.contains("Wikidata"));
         JSONTokener tokener = new JSONTokener(reply);
         JSONObject root = new JSONObject(tokener);
