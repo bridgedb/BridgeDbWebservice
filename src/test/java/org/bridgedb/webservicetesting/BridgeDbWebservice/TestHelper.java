@@ -16,7 +16,11 @@ package org.bridgedb.webservicetesting.BridgeDbWebservice;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 
 public class TestHelper {
 
@@ -44,4 +48,15 @@ public class TestHelper {
     	return getPlainTextContent(url);
     }
 
+    public static String postContent(String url, String requestBody) throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+                .build();
+        HttpResponse<String> response = client.send(request,
+                HttpResponse.BodyHandlers.ofString());
+        return response.body();
+    }
+    
 }

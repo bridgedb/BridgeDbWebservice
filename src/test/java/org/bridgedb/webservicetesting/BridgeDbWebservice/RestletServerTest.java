@@ -18,11 +18,18 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.HashMap;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class RestletServerTest {
 
@@ -104,6 +111,15 @@ public class RestletServerTest {
     public void testNoBioregistry() throws Exception {
     	String reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/Human/xrefs/Wd/Q90038963");
         Assert.assertFalse(reply.contains("wikidata:Q90038963"));
+    }
+
+    
+    @Test
+    public void testXrefsBatch() throws Exception {
+        String requestBody = "Q90038963\tWd\n"
+        		+ "P0DTD1-PRO_0000449625\tS\n";
+        String reply = TestHelper.postContent("http://127.0.0.1:" + port + "/Human/xrefsBatch", requestBody);
+        System.out.println(reply);
     }
 
 }
