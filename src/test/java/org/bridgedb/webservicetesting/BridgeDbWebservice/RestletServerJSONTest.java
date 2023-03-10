@@ -14,13 +14,10 @@
 package org.bridgedb.webservicetesting.BridgeDbWebservice;
 
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -68,13 +65,7 @@ public class RestletServerJSONTest {
 
     @Test
     public void testSources() throws Exception {
-        URL queryURL = new URL("http://127.0.0.1:" + port + "/Human/sourceDataSources");
-        HttpURLConnection connection = (HttpURLConnection)queryURL.openConnection();
-        connection.setRequestProperty("Accept", "application/json");
-        InputStream input = connection.getInputStream();
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        input.transferTo(buffer);
-        String reply = buffer.toString();
+    	String reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/Human/sourceDataSources");
         Assert.assertTrue(reply.contains("Wikidata"));
         JSONTokener tokener = new JSONTokener(reply);
         JSONObject root = new JSONObject(tokener);

@@ -14,18 +14,14 @@
 package org.bridgedb.webservicetesting.BridgeDbWebservice;
 
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class RestletServerTest {
@@ -66,36 +62,19 @@ public class RestletServerTest {
 
     @Test
     public void testProperties() throws Exception {
-        URL queryURL = new URL("http://127.0.0.1:" + port + "/Human/properties");
-        URLConnection connection = queryURL.openConnection();
-        InputStream input = connection.getInputStream();
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        input.transferTo(buffer);
-        String reply = buffer.toString();
+    	String reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/Human/properties");
         Assert.assertTrue(reply.contains("DATASOURCENAME"));
     }
 
     @Test
     public void testSources() throws Exception {
-        URL queryURL = new URL("http://127.0.0.1:" + port + "/Human/sourceDataSources");
-        URLConnection connection = queryURL.openConnection();
-        InputStream input = connection.getInputStream();
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        input.transferTo(buffer);
-        String reply = buffer.toString();
-        System.out.println(reply);
+    	String reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/Human/sourceDataSources");
         Assert.assertTrue(reply.contains("Wikidata"));
     }
 
     @Test
     public void testTargets() throws Exception {
-        URL queryURL = new URL("http://127.0.0.1:" + port + "/Human/targetDataSources");
-        URLConnection connection = queryURL.openConnection();
-        InputStream input = connection.getInputStream();
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        input.transferTo(buffer);
-        String reply = buffer.toString();
-        System.out.println(reply);
+    	String reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/Human/targetDataSources");
         Assert.assertTrue(reply.contains("Wikidata"));
     }
 
