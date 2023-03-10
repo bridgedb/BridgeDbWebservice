@@ -21,6 +21,7 @@ import java.io.InputStream;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.json.JSONString;
 import org.json.JSONTokener;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -79,6 +80,20 @@ public class RestletServerJSONTest {
     	String reply =  TestHelper.getJSONContent("http://127.0.0.1:" + port + "/Catz/sourceDataSources");
         Assert.assertTrue(reply.contains("<html>"));
         Assert.assertTrue(reply.contains("Unknown organism"));
+    }
+
+    @Test
+    public void testProperties() throws Exception {
+        String reply =  TestHelper.getJSONContent("http://127.0.0.1:" + port + "/Human/properties");
+        System.out.println(reply);
+        JSONTokener tokener = new JSONTokener(reply);
+        JSONObject root = new JSONObject(tokener);
+        String source = (String)root.get("DATASOURCENAME");
+        Assert.assertNotNull(source);
+        Assert.assertTrue(source.equals("Wikidata"));
+        String version = (String)root.get("SCHEMAVERSION");
+        Assert.assertNotNull(version);
+        Assert.assertTrue(version.equals("3"));
     }
 
 }
