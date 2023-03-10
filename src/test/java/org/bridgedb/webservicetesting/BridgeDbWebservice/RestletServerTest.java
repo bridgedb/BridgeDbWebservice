@@ -94,6 +94,13 @@ public class RestletServerTest {
     }
 
     @Test
+    public void testXrefs_DataSource() throws Exception {
+    	String reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/Human/xrefs/Wd/Q90038963?dataSource=S");
+        Assert.assertFalse(reply.contains("Wikidata"));
+        Assert.assertTrue(reply.contains("P0DTD1-PRO_0000449625"));
+    }
+
+    @Test
     public void testNoBioregistry() throws Exception {
     	String reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/Human/xrefs/Wd/Q90038963");
         Assert.assertFalse(reply.contains("wikidata:Q90038963"));
