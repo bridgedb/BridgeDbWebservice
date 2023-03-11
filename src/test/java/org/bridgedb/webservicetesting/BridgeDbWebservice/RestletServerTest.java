@@ -153,4 +153,15 @@ public class RestletServerTest {
             );
         assertTrue(thrown.getMessage().contains("favicon.ico"));
     }
+
+    @Disabled("broken in the old webservice; need to figure out the expected output")
+    public void testConfig() throws Exception {
+        String reply = TestHelper.getContent("http://127.0.0.1:" + port + "/config");
+    }
+
+    @Test
+    public void testContents() throws Exception {
+        String reply = TestHelper.getContent("http://127.0.0.1:" + port + "/contents");
+        assertTrue(reply.contains("Human"));
+    }
 }
