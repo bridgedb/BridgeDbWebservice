@@ -154,9 +154,12 @@ public class RestletServerTest {
         assertTrue(thrown.getMessage().contains("favicon.ico"));
     }
 
-    @Disabled("broken in the old webservice; need to figure out the expected output")
+    @Test
     public void testConfig() throws Exception {
         String reply = TestHelper.getContent("http://127.0.0.1:" + port + "/config");
+        assertTrue(reply.contains("java.version"));
+        assertTrue(reply.contains("bridgedb.version"));
+        assertTrue(reply.contains("webservice.version"));
     }
 
     @Test
