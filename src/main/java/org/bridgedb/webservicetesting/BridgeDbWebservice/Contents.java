@@ -9,12 +9,14 @@ import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.representation.Variant;
 import org.restlet.resource.Get;
-import org.restlet.resource.ServerResource;
 
-public class Contents extends ServerResource {
+public class Contents extends RestletResource {
 
 	@Get("json")
 	public Representation get(Variant variant) {
+		if (getGdbProvider().getOrganisms().size() == 0) {
+			return new StringRepresentation("\n");
+		}
 		try {
 			if (MediaType.APPLICATION_JSON.isCompatible(variant.getMediaType())) {
 		        JSONObject jsonObject = new JSONObject();
