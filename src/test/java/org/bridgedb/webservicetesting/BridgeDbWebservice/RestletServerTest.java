@@ -13,6 +13,7 @@
 // limitations under the License.
 package org.bridgedb.webservicetesting.BridgeDbWebservice;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -184,6 +185,6 @@ public class RestletServerTest {
     @Test
     public void testIsFreeSearchSupported() throws Exception {
         String reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/Human/isFreeSearchSupported");
-        assertSame("true", reply);
+        assertEquals("true", reply);
     }
 }
