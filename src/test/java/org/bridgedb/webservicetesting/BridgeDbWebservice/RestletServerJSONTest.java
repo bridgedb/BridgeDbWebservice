@@ -13,6 +13,9 @@
 // limitations under the License.
 package org.bridgedb.webservicetesting.BridgeDbWebservice;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -21,19 +24,17 @@ import java.io.InputStream;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.json.JSONString;
 import org.json.JSONTokener;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class RestletServerJSONTest {
 
 	private static int port = 1074;
 	private static RestletServer server;
 
-    @BeforeClass
+    @BeforeAll
     public static void startServer() throws IOException {
         // set up a test Derby file
         File derbyFile = File.createTempFile("bdb", "bridge");
@@ -59,7 +60,7 @@ public class RestletServerJSONTest {
         RestletServerJSONTest.server.run(port, configFile, false, false);
     }
 
-    @AfterClass
+    @AfterAll
     public static void stopServer() {
     	RestletServerJSONTest.server.stop();
     }
@@ -67,19 +68,19 @@ public class RestletServerJSONTest {
     @Test
     public void testSources() throws Exception {
     	String reply =  TestHelper.getJSONContent("http://127.0.0.1:" + port + "/Human/sourceDataSources");
-        Assert.assertTrue(reply.contains("Wikidata"));
+        assertTrue(reply.contains("Wikidata"));
         JSONTokener tokener = new JSONTokener(reply);
         JSONObject root = new JSONObject(tokener);
         JSONArray sources = (JSONArray)root.get("supportedSourceDatasources");
-        Assert.assertNotNull(sources);
-        Assert.assertTrue(sources.toList().contains("Wikidata"));
+        assertNotNull(sources);
+        assertTrue(sources.toList().contains("Wikidata"));
     }
 
     @Test
     public void testSources_UnknownSpecies() throws Exception {
     	String reply =  TestHelper.getJSONContent("http://127.0.0.1:" + port + "/Catz/sourceDataSources");
-        Assert.assertTrue(reply.contains("<html>"));
-        Assert.assertTrue(reply.contains("Unknown organism"));
+        assertTrue(reply.contains("<html>"));
+        assertTrue(reply.contains("Unknown organism"));
     }
 
     @Test
@@ -89,11 +90,11 @@ public class RestletServerJSONTest {
         JSONTokener tokener = new JSONTokener(reply);
         JSONObject root = new JSONObject(tokener);
         String source = (String)root.get("DATASOURCENAME");
-        Assert.assertNotNull(source);
-        Assert.assertTrue(source.equals("Wikidata"));
+        assertNotNull(source);
+        assertTrue(source.equals("Wikidata"));
         String version = (String)root.get("SCHEMAVERSION");
-        Assert.assertNotNull(version);
-        Assert.assertTrue(version.equals("3"));
+        assertNotNull(version);
+        assertTrue(version.equals("3"));
     }
 
 }

@@ -13,30 +13,28 @@
 // limitations under the License.
 package org.bridgedb.webservicetesting.BridgeDbWebservice;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.HashMap;
 
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class RestletServerTest {
 
 	private static int port = 1074;
 	private static RestletServer server;
 
-    @BeforeClass
+    @BeforeAll
     public static void startServer() throws IOException {
         // set up a test Derby file
         File derbyFile = File.createTempFile("bdb", "bridge");
@@ -62,7 +60,7 @@ public class RestletServerTest {
         RestletServerTest.server.run(port, configFile, false, false);
     }
 
-    @AfterClass
+    @AfterAll
     public static void stopServer() {
         RestletServerTest.server.stop();
     }
@@ -70,47 +68,47 @@ public class RestletServerTest {
     @Test
     public void testProperties() throws Exception {
     	String reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/Human/properties");
-        Assert.assertTrue(reply.contains("DATASOURCENAME"));
+        assertTrue(reply.contains("DATASOURCENAME"));
     }
 
     @Test
     public void testSources() throws Exception {
     	String reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/Human/sourceDataSources");
-        Assert.assertTrue(reply.contains("Wikidata"));
+        assertTrue(reply.contains("Wikidata"));
     }
 
     @Test
     public void testTargets() throws Exception {
     	String reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/Human/targetDataSources");
-        Assert.assertTrue(reply.contains("Wikidata"));
+        assertTrue(reply.contains("Wikidata"));
     }
 
     @Test
     public void testXrefExists() throws Exception {
     	String reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/Human/xrefExists/Wd/Q90038963");
-        Assert.assertTrue(reply.equals("true"));
+        assertTrue(reply.equals("true"));
     	reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/Human/xrefExists/Wd/Q0");
-        Assert.assertTrue(reply.equals("false"));
+        assertTrue(reply.equals("false"));
     }
 
     @Test
     public void testXrefs() throws Exception {
     	String reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/Human/xrefs/Wd/Q90038963");
-        Assert.assertTrue(reply.contains("Wikidata"));
-        Assert.assertTrue(reply.contains("P0DTD1-PRO_0000449625"));
+        assertTrue(reply.contains("Wikidata"));
+        assertTrue(reply.contains("P0DTD1-PRO_0000449625"));
     }
 
     @Test
     public void testXrefs_DataSource() throws Exception {
     	String reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/Human/xrefs/Wd/Q90038963?dataSource=S");
-        Assert.assertFalse(reply.contains("Wikidata"));
-        Assert.assertTrue(reply.contains("P0DTD1-PRO_0000449625"));
+        assertFalse(reply.contains("Wikidata"));
+        assertTrue(reply.contains("P0DTD1-PRO_0000449625"));
     }
 
     @Test
     public void testNoBioregistry() throws Exception {
     	String reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/Human/xrefs/Wd/Q90038963");
-        Assert.assertFalse(reply.contains("wikidata:Q90038963"));
+        assertFalse(reply.contains("wikidata:Q90038963"));
     }
 
     @Test
@@ -118,17 +116,16 @@ public class RestletServerTest {
         String requestBody = "Q90038963\tWd\n"
         		+ "P0DTD1-PRO_0000449625\tS\n";
         String reply = TestHelper.postContent("http://127.0.0.1:" + port + "/Human/xrefsBatch", requestBody);
-        Assert.assertTrue(reply.contains("S:P0DTD1-PRO_0000449625"));
-        Assert.assertTrue(reply.contains("Wd:Q90038963"));
-        Assert.assertFalse(reply.contains(":T"));
-        Assert.assertFalse(reply.contains(":F"));
+        assertTrue(reply.contains("S:P0DTD1-PRO_0000449625"));
+        assertTrue(reply.contains("Wd:Q90038963"));
+        assertFalse(reply.contains(":T"));
+        assertFalse(reply.contains(":F"));
     }
 
     @Test
     public void testAttributes() throws Exception {
         String replyWikidata = TestHelper.getContent("http://127.0.0.1:" + port + "/Human/attributes/Wd/Q90038963");
         String replyUniprot = TestHelper.getContent("http://127.0.0.1:" + port + "/Human/attributes/S/P0DTD1-PRO_0000449625");
-        Assert.assertSame(replyWikidata, replyUniprot);
+        assertSame(replyWikidata, replyUniprot);
     }
-
 }
