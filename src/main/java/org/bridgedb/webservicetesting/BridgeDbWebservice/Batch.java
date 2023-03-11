@@ -125,9 +125,14 @@ public class Batch extends RestletResource {
 						result.append(ds.getFullName());
 						result.append("\t");
 						Iterator<Xref> iter = xrefs.iterator();
-						result.append(iter.next());
+						// we already tested that the set is not empty
+						Xref xref = iter.next();
+						result.append(xref.getDataSource().getSystemCode()).append(":")
+						      .append(xref.getId().trim());
 						while (iter.hasNext()) {
-							result.append("," + iter.next().getId().trim());
+							xref = iter.next();
+							result.append(",").append(xref.getDataSource().getSystemCode())
+							      .append(":").append(xref.getId().trim());
 						}
 						result.append("\n");
 					}
