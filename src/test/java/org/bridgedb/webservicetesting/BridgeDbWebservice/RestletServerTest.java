@@ -15,10 +15,12 @@ package org.bridgedb.webservicetesting.BridgeDbWebservice;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -126,5 +128,29 @@ public class RestletServerTest {
         String replyWikidata = TestHelper.getContent("http://127.0.0.1:" + port + "/Human/attributes/Wd/Q90038963");
         String replyUniprot = TestHelper.getContent("http://127.0.0.1:" + port + "/Human/attributes/S/P0DTD1-PRO_0000449625");
         assertSame(replyWikidata, replyUniprot);
+    }
+
+    @Test
+    public void testIsMappingSupported() throws Exception {
+        String reply = TestHelper.getContent("http://127.0.0.1:" + port + "/Human/isMappingSupported/Wd/S");
+        assertTrue(reply.equals("true"));
+        reply = TestHelper.getContent("http://127.0.0.1:" + port + "/Human/isMappingSupported/S/Wd");
+        assertTrue(reply.equals("true"));
+    }
+
+    @Test
+    public void testAtributeSet() throws Exception {
+        String reply = TestHelper.getContent("http://127.0.0.1:" + port + "/Human/attributeSet");
+        assertTrue(reply.contains("virus"));
+    }
+
+    @Test
+    public void testFavicon() throws Exception {
+        FileNotFoundException thrown = assertThrows(
+            FileNotFoundException.class,
+                () -> TestHelper.getContent("http://127.0.0.1:" + port + "/favicon.ico"),
+                "Expected a 404 but did not get it"
+            );
+        assertTrue(thrown.getMessage().contains("favicon.ico"));
     }
 }
