@@ -127,7 +127,7 @@ public class Batch extends RestletResource {
 						Iterator<Xref> iter = xrefs.iterator();
 						result.append(iter.next());
 						while (iter.hasNext()) {
-							result.append("," + iter.next().getBioregistryIdentifier());
+							result.append("," + iter.next().getId().trim());
 						}
 						result.append("\n");
 					}
