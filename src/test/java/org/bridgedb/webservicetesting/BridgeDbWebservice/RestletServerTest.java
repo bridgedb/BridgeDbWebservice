@@ -123,8 +123,15 @@ public class RestletServerTest {
         assertFalse(reply.contains(":F"));
     }
 
-    @Disabled("Known to not work right now")
+    @Test
     public void testAttributes() throws Exception {
+        String reply = TestHelper.getContent("http://127.0.0.1:" + port + "/Human/attributes/Wd/Q90038963");
+        assertTrue(reply.contains("virus"));
+        assertTrue(reply.contains("SARS-CoV-2"));
+    }
+
+    @Disabled("Known to not work right now")
+    public void testAttributesViaMappings() throws Exception {
         String replyWikidata = TestHelper.getContent("http://127.0.0.1:" + port + "/Human/attributes/Wd/Q90038963");
         String replyUniprot = TestHelper.getContent("http://127.0.0.1:" + port + "/Human/attributes/S/P0DTD1-PRO_0000449625");
         assertSame(replyWikidata, replyUniprot);
@@ -166,5 +173,17 @@ public class RestletServerTest {
     public void testContents() throws Exception {
         TestHelper.getContent("http://127.0.0.1:" + port + "/contents");
         // this normally returns a list of species, but not for this test file
+    }
+
+    @Test
+    public void testDatasources() throws Exception {
+        String reply = TestHelper.getContent("http://127.0.0.1:" + port + "/datasources");
+        assertTrue(reply.contains("KNApSAcK"));
+    }
+
+    @Test
+    public void testIsFreeSearchSupported() throws Exception {
+        String reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/Human/isFreeSearchSupported");
+        assertSame("true", reply);
     }
 }
