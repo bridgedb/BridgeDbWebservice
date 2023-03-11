@@ -119,7 +119,10 @@ public class RestletServerTest {
         String requestBody = "Q90038963\tWd\n"
         		+ "P0DTD1-PRO_0000449625\tS\n";
         String reply = TestHelper.postContent("http://127.0.0.1:" + port + "/Human/xrefsBatch", requestBody);
-        System.out.println(reply);
+        Assert.assertTrue(reply.contains("S:P0DTD1-PRO_0000449625"));
+        Assert.assertTrue(reply.contains("Wd:Q90038963"));
+        Assert.assertFalse(reply.contains(":T"));
+        Assert.assertFalse(reply.contains(":F"));
     }
 
 }
