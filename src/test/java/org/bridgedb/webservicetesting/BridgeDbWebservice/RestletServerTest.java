@@ -113,7 +113,6 @@ public class RestletServerTest {
         Assert.assertFalse(reply.contains("wikidata:Q90038963"));
     }
 
-    
     @Test
     public void testXrefsBatch() throws Exception {
         String requestBody = "Q90038963\tWd\n"
@@ -123,6 +122,13 @@ public class RestletServerTest {
         Assert.assertTrue(reply.contains("Wd:Q90038963"));
         Assert.assertFalse(reply.contains(":T"));
         Assert.assertFalse(reply.contains(":F"));
+    }
+
+    @Test
+    public void testAttributes() throws Exception {
+        String replyWikidata = TestHelper.getContent("http://127.0.0.1:" + port + "/Human/attributes/Wd/Q90038963");
+        String replyUniprot = TestHelper.getContent("http://127.0.0.1:" + port + "/Human/attributes/S/P0DTD1-PRO_0000449625");
+        Assert.assertSame(replyWikidata, replyUniprot);
     }
 
 }
