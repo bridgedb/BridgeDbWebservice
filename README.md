@@ -1,5 +1,6 @@
 [![DOI](https://zenodo.org/badge/546656929.svg)](https://zenodo.org/badge/latestdoi/546656929)
 [![build](https://github.com/bridgedb/BridgeDbWebservice/actions/workflows/build.yml/badge.svg)](https://github.com/bridgedb/BridgeDbWebservice/actions/workflows/build.yml)
+[![codecov](https://codecov.io/gh/bridgedb/BridgeDbWebservice/branch/main/graph/badge.svg?token=E1NGWVWL04)](https://codecov.io/gh/bridgedb/BridgeDbWebservice)
 
 # BridgeDb Webservice 2.x
 
