@@ -8,9 +8,17 @@ jobs:
   trigger-docker-update:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Retrieve release tag
+        run: |
+          echo "BDBWSVERSION=$(cat pom.xml | grep -m 1 -oP "(?<=<version>).*" | sed 's|</version>||g')" >> $GITHUB_ENV 
+          echo New version = ${{ env.BDBWSVERSION }}
       - name: Trigger docker release
         uses: peter-evans/repository-dispatch@v2
         with:
           token: ${{ secrets.pat_external_workflow }}
           repository: bridgedb/docker
           event-type: update-event
+          client-payload: '{"BDBWSVERSION": "${{ env.BDBWSVERSION }}"}'
+          
