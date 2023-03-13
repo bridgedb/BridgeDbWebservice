@@ -12,7 +12,7 @@ jobs:
         run: echo "TARGET=$(${{ github.event.repository.owner }})/docker" >> $GITHUB_ENV 
       - name: Retrieve release tag
         run: |
-          echo "BDBWSVERSION=$(cat pom.xml | grep -m 1 -oP "(?<=<version>).*" | sed 's|</version>||g') >> $GITHUB_ENV 
+          echo "BDBWSVERSION=$(cat pom.xml | grep -m 1 -oP "(?<=<version>).*" | sed 's|</version>||g')" >> $GITHUB_ENV 
       - name: Trigger docker release
         uses: peter-evans/repository-dispatch@v2
         with:
