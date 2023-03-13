@@ -13,12 +13,12 @@ jobs:
       - name: Retrieve release tag
         run: |
           echo "BDBWSVERSION=$(cat pom.xml | grep -m 1 -oP "(?<=<version>).*" | sed 's|</version>||g')" >> $GITHUB_ENV 
-          echo New version = ${{ env.BDBWSVERSION }}
+          echo "BDBVERSION=$(cat pom.xml | grep -m 1 -oP "(?<=<bridgedb-version>).*" | sed 's|</bridgedb-version>||g')"
       - name: Trigger docker release
         uses: peter-evans/repository-dispatch@v2
         with:
           token: ${{ secrets.pat_external_workflow }}
           repository: bridgedb/docker
           event-type: update-event
-          client-payload: '{"BDBWSVERSION": "${{ env.BDBWSVERSION }}"}'
+          client-payload: '{"BDBWSVERSION": "${{ env.BDBWSVERSION }}", "BDBVERSION": "${{ env.BDBWSVERSION }}"}'
           
