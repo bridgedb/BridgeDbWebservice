@@ -18,7 +18,7 @@ jobs:
         uses: peter-evans/repository-dispatch@v2
         with:
           token: ${{ secrets.pat_external_workflow }}
-          repository: jmillanacosta/docker
+          repository: bridgedb/docker
           event-type: update-event
           client-payload: '{"BDBWSVERSION": "${{ env.BDBWSVERSION }}"}'
           
