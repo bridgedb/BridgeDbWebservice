@@ -20,5 +20,5 @@ jobs:
           token: ${{ secrets.pat_external_workflow }}
           repository: jmillanacosta/docker
           event-type: update-event
-          client-payload: '{"sha": "${{ env.BDBWSVERSION }}"}'
+          client-payload: '{"BDBWSVERSION": "${{ env.BDBWSVERSION }}"}'
           
