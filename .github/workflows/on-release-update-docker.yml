@@ -8,9 +8,16 @@ jobs:
   trigger-docker-update:
     runs-on: ubuntu-latest
     steps:
+      - name: Retrieve target repository BridgeDb/docker
+        run: echo "TARGET=$(${{ github.event.repository.owner }})/docker" >> $GITHUB_ENV 
+      - name: Retrieve release tag
+        run: |
+          echo "BDBWSVERSION=$(cat pom.xml | grep -m 1 -oP "(?<=<version>).*" | sed 's|</version>||g') >> $GITHUB_ENV 
       - name: Trigger docker release
         uses: peter-evans/repository-dispatch@v2
         with:
           token: ${{ secrets.pat_external_workflow }}
-          repository: bridgedb/docker
+          repository: ${{ env.TARGET }}
           event-type: update-event
+          client-payload: '{"version": "${{ env.BDBWSVERSION }}"}'
+          
