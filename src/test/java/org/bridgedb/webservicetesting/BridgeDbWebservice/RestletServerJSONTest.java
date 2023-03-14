@@ -13,6 +13,8 @@
 // limitations under the License.
 package org.bridgedb.webservicetesting.BridgeDbWebservice;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -21,6 +23,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -86,7 +89,6 @@ public class RestletServerJSONTest {
     @Test
     public void testProperties() throws Exception {
         String reply =  TestHelper.getJSONContent("http://127.0.0.1:" + port + "/Human/properties");
-        System.out.println(reply);
         JSONTokener tokener = new JSONTokener(reply);
         JSONObject root = new JSONObject(tokener);
         String source = (String)root.get("DATASOURCENAME");
@@ -95,6 +97,33 @@ public class RestletServerJSONTest {
         String version = (String)root.get("SCHEMAVERSION");
         assertNotNull(version);
         assertTrue(version.equals("3"));
+    }
+
+    @Test
+    public void testContents() throws Exception {
+    	TestHelper.getJSONContent("http://127.0.0.1:" + port + "/contents");
+        // this normally returns a list of species, but not for this test file
+    }
+
+    @Test
+    public void testDatasources() throws Exception {
+    	String reply =  TestHelper.getJSONContent("http://127.0.0.1:" + port + "/datasources");
+    	// test if the reply is JSON
+        JSONTokener tokener = new JSONTokener(reply);
+        new JSONObject(tokener);
+        assertTrue(reply.contains("KNApSAcK"));
+    }
+
+    @Test
+    public void testXrefsBatch() throws Exception {
+        String requestBody = "Q90038963\tWd\n"
+        		+ "P0DTD1-PRO_0000449625\tS\n";
+        String reply =  TestHelper.postJSONContent("http://127.0.0.1:" + port + "/Human/xrefsBatch", requestBody);
+        assertTrue(reply.contains("wikidata:Q90038963"));
+
+        JSONTokener tokener = new JSONTokener(reply);
+        JSONObject root = new JSONObject(tokener);
+        assertEquals("Uniprot-TrEMBL", ((JSONObject)root.get("P0DTD1-PRO_0000449625")).get("datasource"));
     }
 
 }

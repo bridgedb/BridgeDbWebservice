@@ -59,4 +59,16 @@ public class TestHelper {
         return response.body();
     }
     
+    public static String postJSONContent(String url, String requestBody) throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+                .setHeader("Accept", "application/json")
+                .build();
+        HttpResponse<String> response = client.send(request,
+                HttpResponse.BodyHandlers.ofString());
+        return response.body();
+    }
+    
 }
