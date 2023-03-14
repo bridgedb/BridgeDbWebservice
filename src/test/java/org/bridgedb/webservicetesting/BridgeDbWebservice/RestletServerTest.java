@@ -187,4 +187,10 @@ public class RestletServerTest {
         String reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/Human/isFreeSearchSupported");
         assertEquals("true", reply);
     }
+
+    @Test
+    public void testAttributeSearch() throws Exception {
+    	TestHelper.getContent("http://127.0.0.1:" + port + "/Human/attributeSearch/virus");
+    }
+
 }

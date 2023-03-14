@@ -67,7 +67,7 @@ public class AttributeSearch extends RestletResource {
 					result.append(results.get(x));
 					result.append("\n");
 				}
-				return new StringRepresentation(result.toString());
+				return new StringRepresentation(result.toString().isEmpty() ? "\n" : result.toString());
 			}
 
 		} catch (Exception e) {
