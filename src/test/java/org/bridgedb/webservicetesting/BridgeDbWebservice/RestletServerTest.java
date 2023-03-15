@@ -191,6 +191,13 @@ public class RestletServerTest {
     @Test
     public void testAttributeSearch() throws Exception {
     	TestHelper.getContent("http://127.0.0.1:" + port + "/Human/attributeSearch/virus");
+    	// does not return anything right now, bc the test file does not have synonyms
+    }
+
+    @Test
+    public void testNoMatch() throws Exception {
+    	String reply = TestHelper.getContent("http://127.0.0.1:" + port + "/Human");
+    	assertTrue(reply.contains("check the spelling and syntax"));
     }
 
 }
