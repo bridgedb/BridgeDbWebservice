@@ -200,4 +200,10 @@ public class RestletServerTest {
     	assertTrue(reply.contains("check the spelling and syntax"));
     }
 
+    @Test
+    public void testSearch() throws Exception {
+    	TestHelper.getContent("http://127.0.0.1:" + port + "/Human/search/virus");
+    	// does not return anything right now, bc the test file does not have synonyms
+    }
+
 }
