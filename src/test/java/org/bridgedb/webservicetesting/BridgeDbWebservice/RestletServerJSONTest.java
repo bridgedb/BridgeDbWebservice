@@ -80,6 +80,18 @@ public class RestletServerJSONTest {
     }
 
     @Test
+    public void testTargets() throws Exception {
+        String reply =  TestHelper.getJSONContent("http://127.0.0.1:" + port + "/Human/targetDataSources");
+        assertTrue(reply.contains("Wikidata"));
+        JSONTokener tokener = new JSONTokener(reply);
+        JSONObject root = new JSONObject(tokener);
+        JSONArray sources = (JSONArray)root.get("supportedTargetDatasources");
+        assertNotNull(sources);
+        assertTrue(sources.toList().contains("Wikidata"));
+        assertTrue(sources.toList().contains("Guide to Pharmacology Targets"));
+    }
+
+    @Test
     public void testSources_UnknownSpecies() throws Exception {
     	String reply =  TestHelper.getJSONContent("http://127.0.0.1:" + port + "/Catz/sourceDataSources");
         assertTrue(reply.contains("<html>"));
