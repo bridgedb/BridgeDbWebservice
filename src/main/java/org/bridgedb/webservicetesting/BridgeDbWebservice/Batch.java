@@ -24,7 +24,7 @@ public class Batch extends RestletResource {
 	protected void doInit() throws ResourceException {
 		super.doInit();
 		try {
-			System.out.println("Batch Xrefs.doInit start");
+//			System.out.println("Batch Xrefs.doInit start");
 			String dsName = urlDecode((String) getRequest().getAttributes().get(RestletService.PAR_SYSTEM));
 			this.sourceDs = parseDataSource(dsName);
 			String targetDsName = (String) getRequest().getAttributes().get(RestletService.PAR_TARGET_SYSTEM);
@@ -60,7 +60,7 @@ public class Batch extends RestletResource {
 			sr.setMediaType(MediaType.TEXT_HTML);
 			return sr;
     	}
-		System.out.println("Batch Multi Xrefs.getXrefs() start");
+//		System.out.println("Batch Multi Xrefs.getXrefs() start");
 		try {
 			// The result set
 			String postBody = entity.getText();
@@ -147,7 +147,7 @@ public class Batch extends RestletResource {
 	}
 
 	public Representation oneDataSource(Representation entity, Variant variant) {
-		System.out.println("Batch Xrefs.getXrefs() start");
+//		System.out.println("Batch Xrefs.getXrefs() start");
 		try {
 			// The result set
 			String[] splitXrefs = entity.getText().split("\n");

@@ -23,8 +23,8 @@ public class AttributeSearch extends RestletResource {
 			this.searchStr = getAttribute(RestletService.PAR_QUERY);
 			this.attribute = getAttribute(RestletService.PAR_TARGET_ATTR_NAME);
 			String limitStr = getAttribute(RestletService.PAR_TARGET_LIMIT);
-			System.out.println("limit string:"+ limitStr);
-			System.out.println("attribute string:"+ attribute);
+//			System.out.println("limit string:"+ limitStr);
+//			System.out.println("attribute string:"+ attribute);
 			
 			if (null != limitStr) {
 				this.limit = new Integer(limitStr).intValue();

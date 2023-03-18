@@ -159,7 +159,6 @@ public class RestletServerJSONTest {
 
         JSONTokener tokener = new JSONTokener(reply);
         JSONObject root = new JSONObject(tokener);
-        System.out.println(root.get("attributes"));
         assertEquals("virus", ((JSONArray)root.getJSONArray("attributes")).get(0));
     }
 

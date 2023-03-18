@@ -24,7 +24,7 @@ public class Xrefs extends RestletResource{
 	protected void doInit() throws ResourceException {
 		super.doInit();
 		try {
-		    System.out.println( "Xrefs.doInit start" );
+//		    System.out.println( "Xrefs.doInit start" );
 			//Required parameters
 			String id = urlDecode((String)getRequest().getAttributes().get(RestletService.PAR_ID));
 			String dsName = urlDecode((String)getRequest().getAttributes().get(RestletService.PAR_SYSTEM));
@@ -61,7 +61,7 @@ public class Xrefs extends RestletResource{
     		}
     	}
     	
-    	System.out.println( "Xrefs.getXrefs() start" );
+//    	System.out.println( "Xrefs.getXrefs() start" );
 		try {
 			//The result set
 			IDMapper mapper = getIDMappers();
