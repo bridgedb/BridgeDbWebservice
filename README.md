@@ -1,6 +1,7 @@
 [![DOI](https://zenodo.org/badge/546656929.svg)](https://zenodo.org/badge/latestdoi/546656929)
 [![build](https://github.com/bridgedb/BridgeDbWebservice/actions/workflows/build.yml/badge.svg)](https://github.com/bridgedb/BridgeDbWebservice/actions/workflows/build.yml)
 [![codecov](https://codecov.io/gh/bridgedb/BridgeDbWebservice/branch/main/graph/badge.svg?token=E1NGWVWL04)](https://codecov.io/gh/bridgedb/BridgeDbWebservice)
+[![NWO](https://img.shields.io/badge/NWO%20Open%20Science-203.001.121-orange)](https://www.nwo.nl/en/projects/203001121)
 
 # BridgeDb Webservice 2.x
 
