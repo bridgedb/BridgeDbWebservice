@@ -16,13 +16,11 @@ package org.bridgedb.webservicetesting.BridgeDbWebservice;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -139,6 +137,18 @@ public class RestletServerJSONTest {
         JSONTokener tokener = new JSONTokener(reply);
         JSONObject root = new JSONObject(tokener);
         assertEquals("Uniprot-TrEMBL", ((JSONObject)root.get("P0DTD1-PRO_0000449625")).get("datasource"));
+    }
+
+    @Test
+    public void testXrefsBatch_DataSource() throws Exception {
+        String requestBody = "Q90038963\n";
+        String reply =  TestHelper.postJSONContent("http://127.0.0.1:" + port + "/Human/xrefsBatch/Wd", requestBody);
+        assertTrue(reply.contains("wikidata:Q90038963"));
+
+        JSONTokener tokener = new JSONTokener(reply);
+        JSONObject root = new JSONObject(tokener);
+        assertEquals("Wikidata", ((JSONObject)root.get("Q90038963")).get("datasource"));
+        assertTrue(((JSONArray)((JSONObject)root.get("Q90038963")).get("result set")).toList().contains("uniprot:P0DTD1-PRO_0000449625"));
     }
 
     @Test
