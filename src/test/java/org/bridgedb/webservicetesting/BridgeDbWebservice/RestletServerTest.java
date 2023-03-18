@@ -125,6 +125,16 @@ public class RestletServerTest {
     }
 
     @Test
+    public void testXrefsBatch_DataSource() throws Exception {
+        String requestBody = "Q90038963\n";
+        String reply = TestHelper.postContent("http://127.0.0.1:" + port + "/Human/xrefsBatch/Wd", requestBody);
+        assertTrue(reply.contains("S:P0DTD1-PRO_0000449625"));
+        assertTrue(reply.contains("Wd:Q90038963"));
+        assertFalse(reply.contains(":T"));
+        assertFalse(reply.contains(":F"));
+    }
+
+    @Test
     public void testAttributes() throws Exception {
         String reply = TestHelper.getContent("http://127.0.0.1:" + port + "/Human/attributes/Wd/Q90038963");
         assertTrue(reply.contains("virus"));
