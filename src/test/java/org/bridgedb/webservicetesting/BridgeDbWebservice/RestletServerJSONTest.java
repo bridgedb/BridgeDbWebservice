@@ -14,7 +14,6 @@
 package org.bridgedb.webservicetesting.BridgeDbWebservice;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -23,7 +22,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -136,6 +134,28 @@ public class RestletServerJSONTest {
         JSONTokener tokener = new JSONTokener(reply);
         JSONObject root = new JSONObject(tokener);
         assertEquals("Uniprot-TrEMBL", ((JSONObject)root.get("P0DTD1-PRO_0000449625")).get("datasource"));
+    }
+
+    @Test
+    public void testAttributes() throws Exception {
+        String reply = TestHelper.getJSONContent("http://127.0.0.1:" + port + "/Human/attributes/Wd/Q90038963");
+        assertTrue(reply.contains("virus"));
+        assertTrue(reply.contains("SARS-CoV-2"));
+
+        JSONTokener tokener = new JSONTokener(reply);
+        JSONObject root = new JSONObject(tokener);
+        assertEquals("SARS-CoV-2", root.get("virus"));
+    }
+
+    @Test
+    public void testAtributeSet() throws Exception {
+        String reply = TestHelper.getJSONContent("http://127.0.0.1:" + port + "/Human/attributeSet");
+        assertTrue(reply.contains("virus"));
+
+        JSONTokener tokener = new JSONTokener(reply);
+        JSONObject root = new JSONObject(tokener);
+        System.out.println(root.get("attributes"));
+        assertEquals("virus", ((JSONArray)root.getJSONArray("attributes")).get(0));
     }
 
 }
