@@ -8,7 +8,7 @@ The BridgeDb Webservice provides a REST service to access identifier mapping dat
 
 ## Running the webservice
 
-Use the latest jar file available here: [link](https://github.com/bridgedb/BridgeDbWebservice/releases/download/2.1.2/BridgeDbWebservice-2.1.2-jar-with-dependencies.jar)
+Use the latest jar file available here: [link](https://github.com/bridgedb/BridgeDbWebservice/releases/download/2.1.3/BridgeDbWebservice-2.1.3-jar-with-dependencies.jar)
 
 ### Downloading BridgeDb ID mapping databases
 
