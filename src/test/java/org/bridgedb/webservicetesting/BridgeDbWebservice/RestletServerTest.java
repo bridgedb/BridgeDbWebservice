@@ -94,10 +94,24 @@ public class RestletServerTest {
     }
 
     @Test
+    public void testXrefExists_UnknownSpecies() throws Exception {
+        String reply = TestHelper.getContent("http://127.0.0.1:" + port + "/Catz/xrefExists/Wd/Q90038963");
+        assertTrue(reply.contains("<html>"));
+        assertTrue(reply.contains("Unknown organism"));
+    }
+
+    @Test
     public void testXrefs() throws Exception {
     	String reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/Human/xrefs/Wd/Q90038963");
         assertTrue(reply.contains("Wikidata"));
         assertTrue(reply.contains("P0DTD1-PRO_0000449625"));
+    }
+
+    @Test
+    public void testXrefs_UnknownSpecies() throws Exception {
+    	String reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/Catz/xrefs/Wd/Q90038963");
+        assertTrue(reply.contains("<html>"));
+        assertTrue(reply.contains("Unknown organism"));
     }
 
     @Test
@@ -122,6 +136,15 @@ public class RestletServerTest {
         assertTrue(reply.contains("Wd:Q90038963"));
         assertFalse(reply.contains(":T"));
         assertFalse(reply.contains(":F"));
+    }
+
+    @Test
+    public void testXrefsBatch_UnknownSpecies() throws Exception {
+    	String requestBody = "Q90038963\tWd\n"
+        		+ "P0DTD1-PRO_0000449625\tS\n";
+        String reply = TestHelper.postContent("http://127.0.0.1:" + port + "/Catz/xrefsBatch", requestBody);
+        assertTrue(reply.contains("<html>"));
+        assertTrue(reply.contains("Unknown organism"));
     }
 
     @Test
