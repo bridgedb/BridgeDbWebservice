@@ -93,7 +93,7 @@ public class RestletService extends Application{
 		if (cors) {
 			System.out.println("Setting up CORS to * ...");
 			CorsService corsService = new CorsService();
-       		corsService.setAllowedOrigins( new HashSet(Arrays.asList("*")));
+       		corsService.setAllowedOrigins( new HashSet<String>(Arrays.asList("*")));
         	corsService.setAllowedCredentials(true);
 
             this.getServices().add( corsService );

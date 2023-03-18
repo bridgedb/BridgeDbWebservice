@@ -1,6 +1,7 @@
 package org.bridgedb.webservicetesting.BridgeDbWebservice;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.bridgedb.DataSource;
 import org.bridgedb.IDMapper;
@@ -26,7 +27,7 @@ public class SupportedTargetDataSources extends RestletResource {
 			IDMapper mapper = getIDMappers();
 			if (MediaType.APPLICATION_JSON.isCompatible(variant.getMediaType())) {
 				JSONObject jsonObject = new JSONObject();
-				ArrayList resultSet = new ArrayList<>();
+				List<String> resultSet = new ArrayList<>();
 				for (DataSource ds : mapper.getCapabilities().getSupportedTgtDataSources()) {
 					resultSet.add(ds.getFullName());
 				}

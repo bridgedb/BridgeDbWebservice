@@ -27,7 +27,7 @@ public class AttributeSearch extends RestletResource {
 //			System.out.println("attribute string:"+ attribute);
 			
 			if (null != limitStr) {
-				this.limit = new Integer(limitStr).intValue();
+				this.limit = Integer.valueOf(limitStr);
 			}
 		} catch (Exception e) {
 			throw new ResourceException(e);

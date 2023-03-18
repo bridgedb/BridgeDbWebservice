@@ -2,6 +2,7 @@ package org.bridgedb.webservicetesting.BridgeDbWebservice;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.bridgedb.DataSource;
@@ -71,7 +72,7 @@ public class Batch extends RestletResource {
 				JSONObject jsonObject = new JSONObject();
 				for (String line : splitXrefs) {
 					JSONObject mappedXrefsJson = new JSONObject();
-					ArrayList resultSet = new ArrayList<>();
+					List<String> resultSet = new ArrayList<>();
 					String[] lineSplit = line.split("\t");
 					String id = lineSplit[0].trim();
 
@@ -155,7 +156,7 @@ public class Batch extends RestletResource {
 
 			if (MediaType.APPLICATION_JSON.isCompatible(variant.getMediaType())) {
 				JSONObject jsonObject = new JSONObject();
-				ArrayList resultSet = new ArrayList<>();
+				List<Xref> resultSet = new ArrayList<>();
 				for (String id : splitXrefs) {
 					JSONObject mappedXrefsJson = new JSONObject();
 					// for this id, create this xref object

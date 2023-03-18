@@ -1,12 +1,10 @@
 package org.bridgedb.webservicetesting.BridgeDbWebservice;
 
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
 
-import org.bridgedb.IDMapperException;
 import org.bridgedb.IDMapperStack;
-import org.bridgedb.Xref;
 import org.json.simple.JSONObject;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
@@ -30,7 +28,7 @@ public class AttributeSet extends RestletResource {
 			Set<String> attributes = stack.getAttributeSet();
 			if (MediaType.APPLICATION_JSON.isCompatible(variant.getMediaType())) {
 				JSONObject jsonObject = new JSONObject();
-				ArrayList resultSet = new ArrayList<>();
+				List<String> resultSet = new ArrayList<>();
 				for (String a : attributes) {
 					resultSet.add(a);
 				}

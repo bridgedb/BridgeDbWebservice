@@ -25,7 +25,7 @@ public class FreeSearch extends RestletResource {
 			String limitStr = (String) getRequest().getAttributes().get(RestletService.PAR_TARGET_LIMIT);
 
 			if (null != limitStr) {
-				limit = new Integer(limitStr).intValue();
+				limit = Integer.valueOf(limitStr);
 			}
 		} catch (Exception e) {
 			throw new ResourceException(e);
