@@ -74,15 +74,36 @@ public class RestletServerTest {
     }
 
     @Test
+    public void testProperties_UnknownSpecies() throws Exception {
+        String reply = TestHelper.getContent("http://127.0.0.1:" + port + "/Catz/properties");
+        assertTrue(reply.contains("<html>"));
+        assertTrue(reply.contains("Unknown organism"));
+    }
+
+    @Test
     public void testSources() throws Exception {
     	String reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/Human/sourceDataSources");
         assertTrue(reply.contains("Wikidata"));
     }
 
     @Test
+    public void testSources_UnknownSpecies() throws Exception {
+        String reply = TestHelper.getContent("http://127.0.0.1:" + port + "/Catz/sourceDataSources");
+        assertTrue(reply.contains("<html>"));
+        assertTrue(reply.contains("Unknown organism"));
+    }
+
+    @Test
     public void testTargets() throws Exception {
     	String reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/Human/targetDataSources");
         assertTrue(reply.contains("Wikidata"));
+    }
+
+    @Test
+    public void testTargets_UnknownSpecies() throws Exception {
+        String reply = TestHelper.getContent("http://127.0.0.1:" + port + "/Catz/targetDataSources");
+        assertTrue(reply.contains("<html>"));
+        assertTrue(reply.contains("Unknown organism"));
     }
 
     @Test
