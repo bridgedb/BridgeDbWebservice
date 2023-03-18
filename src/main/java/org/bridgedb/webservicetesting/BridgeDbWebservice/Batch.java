@@ -156,7 +156,7 @@ public class Batch extends RestletResource {
 
 			if (MediaType.APPLICATION_JSON.isCompatible(variant.getMediaType())) {
 				JSONObject jsonObject = new JSONObject();
-				List<Xref> resultSet = new ArrayList<>();
+				List<String> resultSet = new ArrayList<>();
 				for (String id : splitXrefs) {
 					JSONObject mappedXrefsJson = new JSONObject();
 					// for this id, create this xref object
@@ -175,7 +175,7 @@ public class Batch extends RestletResource {
 					} else {
 						Iterator<Xref> iter = xrefs.iterator();
 						while (iter.hasNext()) {
-							resultSet.add(iter.next());
+							resultSet.add(iter.next().getBioregistryIdentifier());
 						}
 						mappedXrefsJson.put("result set", resultSet);
 						mappedXrefsJson.put("datasource", sourceDs.getFullName());
