@@ -14,16 +14,21 @@
 package org.bridgedb.webservicetesting.BridgeDbWebservice;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.junit.jupiter.api.AfterAll;
@@ -156,6 +161,35 @@ public class RestletServerJSONTest {
         JSONObject root = new JSONObject(tokener);
         System.out.println(root.get("attributes"));
         assertEquals("virus", ((JSONArray)root.getJSONArray("attributes")).get(0));
+    }
+
+    @Test
+    public void testXrefs() throws Exception {
+    	String reply =  TestHelper.getJSONContent("http://127.0.0.1:" + port + "/Human/xrefs/Wd/Q90038963");
+        assertTrue(reply.contains("Wikidata"));
+        assertTrue(reply.contains("P0DTD1-PRO_0000449625"));
+
+        JSONTokener tokener = new JSONTokener(reply);
+        JSONObject root = new JSONObject(tokener);
+        assertEquals("Wikidata", root.get("wikidata:Q90038963"));
+        assertEquals("Uniprot-TrEMBL", root.get("uniprot:P0DTD1-PRO_0000449625"));
+    }
+
+    @Test
+    public void testXrefs_DataSource() throws Exception {
+    	String reply =  TestHelper.getJSONContent("http://127.0.0.1:" + port + "/Human/xrefs/Wd/Q90038963?dataSource=S");
+        assertFalse(reply.contains("Wikidata"));
+        assertTrue(reply.contains("P0DTD1-PRO_0000449625"));
+
+        JSONTokener tokener = new JSONTokener(reply);
+        JSONObject root = new JSONObject(tokener);
+        assertEquals("Uniprot-TrEMBL", root.get("uniprot:P0DTD1-PRO_0000449625"));
+        JSONException thrown = assertThrows(
+        	JSONException.class,
+                () -> root.get("wikidata:Q90038963")
+            );
+        assertTrue(thrown.getMessage().contains("wikidata:Q90038963"));
+        assertTrue(thrown.getMessage().contains("not found"));
     }
 
 }
