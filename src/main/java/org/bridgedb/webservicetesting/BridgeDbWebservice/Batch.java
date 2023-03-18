@@ -204,9 +204,13 @@ public class Batch extends RestletResource {
 						result.append(sourceDs.getFullName());
 						result.append("\t");
 						Iterator<Xref> iter = xrefs.iterator();
-						result.append(iter.next());
+						Xref targetXref = iter.next();
+						result.append(targetXref.getDataSource().getSystemCode()).append(":")
+						      .append(targetXref.getId().trim());
 						while (iter.hasNext()) {
-							result.append("," + iter.next());
+							targetXref = iter.next();
+							result.append(",").append(targetXref.getDataSource().getSystemCode())
+							      .append(":").append(targetXref.getId().trim());
 						}
 						result.append("\n");
 					}
