@@ -11,7 +11,7 @@ servers:
   - url: %%BRIDGEDB-SERVER-URL%%
 tags:
   - name: mappings
-    description: Identifier mapping services for gene products, like genes, RNA, and proteins, nutrients, hormones, vitamins, peptides, and chemical copmounds from the exposome
+    description: Identifier mapping services for gene products (e.g. genes, RNA, proteins), metabolites, nutrients, hormones, vitamins, drugs, peptides, and chemical compounds from the exposome
   - name: organism
     description: Services to find details for the organism identifier mappings
   - name: search
