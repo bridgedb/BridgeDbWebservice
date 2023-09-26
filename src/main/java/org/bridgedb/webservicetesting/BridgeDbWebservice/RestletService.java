@@ -55,7 +55,6 @@ public class RestletService extends Application{
 	public static final String URL_CONFIG = "/config";
 	public static final String URL_CONTENTS = "/contents";
 	public static final String URL_NO_MATCH = "/{" + PAR_ORGANISM + "}";
-	public static final String URL_HOME = "/";
 	public static final String URL_FAVICON = "/favicon.ico";
 	public static final String URL_SEARCH = "/{" + PAR_ORGANISM + "}/search/{" + PAR_QUERY + "}";
 	public static final String URL_SEARCH_LIMIT = "/{" + PAR_ORGANISM + "}/search/{" + PAR_QUERY + "}/{"+PAR_TARGET_LIMIT + "}";
@@ -67,6 +66,15 @@ public class RestletService extends Application{
 	public static final String URL_XREFS_BATCH_SOURCE_TARGETDS_QUERY = "/{" + PAR_ORGANISM + "}/xrefsBatch/{" + PAR_SYSTEM +"}/"+PAR_TARGET_SYSTEM;
 	public static final String URL_XREFS_BATCH_SOURCE = "/{" + PAR_ORGANISM + "}/xrefsBatch/{" + PAR_SYSTEM +"}";
 
+	public static final String URL_HOME = "/";
+	public static final String URL_SWAGGER_YAML = "/swagger.yaml";
+	public static final String URL_INDEX_CSS = "/index.css";
+	public static final String URL_SWAGGER_CSS = "/swagger-ui.css";
+	public static final String URL_SWAGGER_UIJS = "/swagger-ui.js";
+	public static final String URL_SWAGGER_INIT = "/swagger-initializer.js";
+	public static final String URL_SWAGGER_UIBUNDLEJS = "/swagger-ui-bundle.js";
+	public static final String URL_SWAGGER_PRESET = "/swagger-ui-standalone-preset.js";
+	
 	private GdbProvider gdbProvider;
 	
 	public RestletService(File aConfigFile, boolean transitive, boolean cors)
@@ -110,6 +118,16 @@ public class RestletService extends Application{
     public Restlet createInboundRoot() {
         System.out.println("Creating the root");
         Router router = new Router(getContext());
+        // the next lines provide the interactive documentation (Swagger aka OpenAPI) 
+		router.attach(URL_HOME, SwaggerUI.class);
+		router.attach(URL_SWAGGER_YAML, SwaggerUI.class);
+		router.attach(URL_INDEX_CSS, SwaggerUI.class);
+		router.attach(URL_SWAGGER_CSS, SwaggerUI.class);
+		router.attach(URL_SWAGGER_UIJS, SwaggerUI.class);
+		router.attach(URL_SWAGGER_UIBUNDLEJS, SwaggerUI.class);
+		router.attach(URL_SWAGGER_INIT, SwaggerUI.class);
+		router.attach(URL_SWAGGER_PRESET, SwaggerUI.class);
+
 		router.attach(URL_FAVICON, Favicon.class);
 
 		Redirector redirector = new Redirector(getContext(), URL_ATTRIBUTE_SEARCH, Redirector.MODE_CLIENT_TEMPORARY);

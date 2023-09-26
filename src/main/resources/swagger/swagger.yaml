@@ -1,0 +1,519 @@
+openapi: 3.0.3
+info:
+  version: 1.0.1
+  title: BridgeDb Webservices
+  description: |-
+    These are the BridgeDb Webservices for identifier to identifier mapping.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+servers:
+  - url: https://webservice.bridgedb.org
+tags:
+  - name: mappings
+    description: Identifier mapping services for gene products, like genes, RNA, and proteins, nutrients, hormones, vitamins, peptides, and chemical copmounds from the exposome
+  - name: organism
+    description: Services to find details for the organism identifier mappings
+  - name: search
+    description: Services to find identifiers
+  - name: attributes
+    description: Services to get and search attributes
+paths:
+  /{organism}/xrefs/{systemCode}/{identifier}:
+    get:
+      tags:
+        - mappings
+      summary: Returns a list of xrefs
+      description: Returns a list of xrefs that map to a given identifier, data source,
+        and organism.
+      parameters:
+        - name: organism
+          in: path
+          required: true
+          description: Organism [Latin name](http://vocabularies.bridgedb.org/#latinName)
+            or [short name](http://vocabularies.bridgedb.org/#shortName).
+          schema:
+            $ref: '#/components/schemas/Organism'
+        - name: systemCode
+          in: path
+          required: true
+          description: system code for the source database
+          schema:
+            $ref: '#/components/schemas/SystemCode'
+        - name: identifier
+          in: path
+          required: true
+          description: source identifier
+          schema:
+            type: string
+      responses:
+        200:
+          description: Returns a tab-delimited list of xrefs that map to a given identifier
+          content:            
+           text/plain:
+              schema:
+                type: string
+           application/json:
+              schema:
+                type: object
+  /{organism}/xrefsBatch:
+    post:
+      tags:
+        - mappings
+      description: Returns a list of xrefs, that maps to a given list of identifiers
+        to a given data source and organism.
+      parameters:
+        - name: organism
+          in: path
+          required: true
+          description: Organism [Latin name](http://vocabularies.bridgedb.org/#latinName)
+            or [short name](http://vocabularies.bridgedb.org/#shortName).
+          schema:
+            $ref: '#/components/schemas/Organism'
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              $ref: '#/components/schemas/XrefBatchInput'
+      responses:
+        200:
+          description: Returns a tab-delimited list of xrefs that map to a given identifier
+          content:            
+           text/plain:
+              schema:
+                type: string
+           application/json:
+              schema:
+                type: object
+  /{organism}/xrefsBatch/{systemCode}:
+    post:
+      tags:
+        - mappings
+      description: Returns a list of xrefs, that maps to a given list of identifiers
+        to a given data source and organism.
+      parameters:
+        - name: organism
+          in: path
+          required: true
+          description: Organism [Latin name](http://vocabularies.bridgedb.org/#latinName)
+            or [short name](http://vocabularies.bridgedb.org/#shortName).
+          schema:
+            $ref: '#/components/schemas/Organism'
+        - name: systemCode
+          in: path
+          required: true
+          description: system code for the source database
+          schema:
+            $ref: '#/components/schemas/SystemCode'
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              $ref: '#/components/schemas/XrefBatchInput'
+      responses:
+        200:
+          description: Returns a tab-delimited list of xrefs that map to a given identifier
+          content:            
+           text/plain:
+              schema:
+                type: string
+           application/json:
+              schema:
+                type: object
+  /{organism}/xrefExists/{systemCode}/{identifier}:
+    get:
+      tags:
+        - search
+      description: Returns a list of xrefs, that maps to a given list of identifiers
+        to a given data source and organism.
+      parameters:
+        - name: organism
+          in: path
+          required: true
+          description: Organism [Latin name](http://vocabularies.bridgedb.org/#latinName)
+            or [short name](http://vocabularies.bridgedb.org/#shortName).
+          schema:
+            $ref: '#/components/schemas/Organism'
+        - name: systemCode
+          in: path
+          required: true
+          description: system code for the source database
+          schema:
+            $ref: '#/components/schemas/SystemCode'
+        - name: identifier
+          in: path
+          required: true
+          description: source identifier
+          schema:
+            type: string
+      responses:
+        200:
+          description: Returns a tab-delimited list of xrefs that map to a given identifier
+          content:            
+           text/plain:
+              schema:
+                type: string
+           application/json:
+              schema:
+                type: object
+  /{organism}/search/{query}:
+    get:
+      tags:
+        - search
+      description: Returns a list of xrefs with identifiers that contain the query string for a given organism. Results are not restricted to exact matches. Optionally limit results to a specified number per data source.
+      parameters:
+        - name: organism
+          in: path
+          required: true
+          description: Organism [Latin name](http://vocabularies.bridgedb.org/#latinName)
+            or [short name](http://vocabularies.bridgedb.org/#shortName).
+          schema:
+            $ref: '#/components/schemas/Organism'
+        - name: query
+          in: path
+          required: true
+          example: 1234
+          description: identifier query
+          schema:
+            type: string
+      responses:
+        200:
+          description: Returns a tab-delimited list of xrefs that match to a given query
+          content:            
+           text/plain:
+              schema:
+                type: string
+           application/json:
+              schema:
+                type: object
+  /{organism}/attributeSearch/{query}:
+    get:
+      tags:
+        - attributes
+      description: Returns a list of xrefs and associated attributes that contain the query string for a given organism. Results are not restricted to exact matches. Optionally limit results to a specified number per data source, or by the type of attribute. See possible attribute types via /{organism}/attributeSet.
+      parameters:
+        - name: organism
+          in: path
+          required: true
+          description: Organism [Latin name](http://vocabularies.bridgedb.org/#latinName)
+            or [short name](http://vocabularies.bridgedb.org/#shortName).
+          schema:
+            $ref: '#/components/schemas/Organism'
+        - name: query
+          in: path
+          required: true
+          example: 1234
+          description: identifier query
+          schema:
+            type: string
+      responses:
+        200:
+          description: Returns a tab-delimited list of xrefs that match to a given query
+          content:            
+           text/plain:
+              schema:
+                type: string
+           application/json:
+              schema:
+                type: object
+  /{organism}/properties:
+    get:
+      tags:
+        - organism
+      description: Returns the list of properties available for a given organism.
+      parameters:
+        - name: organism
+          in: path
+          required: true
+          description: Organism [Latin name](http://vocabularies.bridgedb.org/#latinName)
+            or [short name](http://vocabularies.bridgedb.org/#shortName).
+          schema:
+            $ref: '#/components/schemas/Organism'
+      responses:
+        200:
+          description: Returns a tab-delimited list of xrefs that match to a given query
+          content:            
+           text/plain:
+              schema:
+                type: string
+           application/json:
+              schema:
+                type: object
+  /{organism}/sourceDataSources:
+    get:
+      tags:
+        - organism
+      description: Returns a list of data sources available as xref sources for a given organism.
+      parameters:
+        - name: organism
+          in: path
+          required: true
+          description: Organism [Latin name](http://vocabularies.bridgedb.org/#latinName)
+            or [short name](http://vocabularies.bridgedb.org/#shortName).
+          schema:
+            $ref: '#/components/schemas/Organism'
+      responses:
+        200:
+          description: Returns a tab-delimited list of xrefs that match to a given query
+          content:            
+           text/plain:
+              schema:
+                type: string
+           application/json:
+              schema:
+                type: object
+  /{organism}/targetDataSources:
+    get:
+      tags:
+        - organism
+      description: Returns a list of data sources available as xref sources for a given organism.
+      parameters:
+        - name: organism
+          in: path
+          required: true
+          description: Organism [Latin name](http://vocabularies.bridgedb.org/#latinName)
+            or [short name](http://vocabularies.bridgedb.org/#shortName).
+          schema:
+            $ref: '#/components/schemas/Organism'
+      responses:
+        200:
+          description: Returns a tab-delimited list of xrefs that match to a given query
+          content:            
+           text/plain:
+              schema:
+                type: string
+           application/json:
+              schema:
+                type: object
+  /{organism}/isFreeSearchSupported:
+    get:
+      tags:
+        - organism
+      description: Returns true or false based on whether or not /{organism}/search/{query} is supported for a given organism.
+      parameters:
+        - name: organism
+          in: path
+          required: true
+          description: Organism [Latin name](http://vocabularies.bridgedb.org/#latinName)
+            or [short name](http://vocabularies.bridgedb.org/#shortName).
+          schema:
+            $ref: '#/components/schemas/Organism'
+      responses:
+        200:
+          description: Returns a tab-delimited list of xrefs that match to a given query
+          content:            
+           text/plain:
+              schema:
+                type: boolean
+           application/json:
+              schema:
+                type: object
+  /{organism}/isMappingSupported/{sourceSystemCode}/{targetSystemCode}:
+    get:
+      tags:
+        - organism
+      description: Returns true or false based on whether or not /{organism}/search/{query} is supported for a given organism.
+      parameters:
+        - name: organism
+          in: path
+          required: true
+          description: Organism [Latin name](http://vocabularies.bridgedb.org/#latinName)
+            or [short name](http://vocabularies.bridgedb.org/#shortName).
+          schema:
+            $ref: '#/components/schemas/Organism'
+        - name: sourceSystemCode
+          in: path
+          required: true
+          description: system code for the source database
+          schema:
+            $ref: '#/components/schemas/SystemCode'
+        - name: targetSystemCode
+          in: path
+          required: true
+          description: system code for the source database
+          schema:
+            $ref: '#/components/schemas/SystemCode'
+      responses:
+        200:
+          description: Returns true or false based on whether or not /{organism}/xrefs/{systemCode}/{identifier} would possibly return a {targetSystemCode} result given a {sourceSystemCode} query. This function basically combines the results of /{organism}/sourceDataSources and /{organism}/targetDataSources into a single boolean result.
+          content:            
+           text/plain:
+              schema:
+                type: boolean
+           application/json:
+              schema:
+                type: object
+  /{organism}/attributeSet:
+    get:
+      tags:
+        - organism
+      description: Returns the supported attributes to the given Organism.
+      parameters:
+        - name: organism
+          in: path
+          required: true
+          description: Organism [Latin name](http://vocabularies.bridgedb.org/#latinName)
+            or [short name](http://vocabularies.bridgedb.org/#shortName).
+          schema:
+            $ref: '#/components/schemas/Organism'
+      responses:
+        200:
+          description: Returns a tab-delimited list of xrefs that match to a given query
+          content:            
+           text/plain:
+              schema:
+                type: boolean
+           application/json:
+              schema:
+                type: object
+  /{organism}/attributes/{systemCode}/{identifier}:
+    get:
+      tags:
+        - attributes
+      description: Returns the attributes for a given identifier, data source, organism. Optionally display only a specified attribute.
+      parameters:
+        - name: organism
+          in: path
+          required: true
+          description: Organism [Latin name](http://vocabularies.bridgedb.org/#latinName)
+            or [short name](http://vocabularies.bridgedb.org/#shortName).
+          schema:
+            $ref: '#/components/schemas/Organism'
+        - name: systemCode
+          in: path
+          required: true
+          description: system code for the source database
+          schema:
+            $ref: '#/components/schemas/SystemCode'
+        - name: identifier
+          in: path
+          required: true
+          description: source identifier
+          schema:
+            type: string
+      responses:
+        200:
+          description: Returns a tab-delimited list with the attributes and their content
+          content:            
+           text/plain:
+              schema:
+                type: boolean
+           application/json:
+              schema:
+                type: object
+
+components:
+    schemas:
+      SystemCode:
+        type: string
+        description: System code as used by BridgeDb, see [this list](https://www.bridgedb.org/pages/system-codes.html).
+        default: En
+        enum:
+          - En
+          - Cs
+          - X
+          - E
+          - Rh
+          - Ck
+          - Eco
+          - Cg
+          - Ch
+          - Il
+          - Uc
+          - Rf
+          - Pd
+          - U
+          - Ma
+          - Lm
+          - Wd
+          - Wi
+          - Cpc
+          - Mb
+          - Rk
+          - Ce
+          - S
+          - L
+          - Wg
+          - Om
+          - T
+          - Mc
+          - Ik
+          - H
+          - Re
+          - Ag
+          - Q
+          - Ca
+          - Up
+          - Cks
+      Organism:
+        type: string
+        default: Human
+        enum:
+          - Human
+          - Homo sapiens
+          - Tuberculosis
+          - Mycobacterium tuberculosis
+          - Mosquito
+          - Anopheles gambiae
+          - Zebra fish
+          - Danio rerio
+          - Arabidopsis thaliana
+          - Rice
+          - Oryza sativa
+          - Sea Squirt
+          - Ciona intestinalis
+          - Barley
+          - Hordeum vulgare
+          - Frog
+          - Xenopus tropicalis
+          - Soybean
+          - Glycine max
+          - Fruit fly
+          - Drosophila melanogaster
+          - Horse
+          - Equus caballus
+          - Rhesus Monkey
+          - Macaca mulatta
+          - Wine Grape
+          - Vitis vinifera
+          - Yeast
+          - Saccharomyces cerevisiae
+          - Tomato
+          - Solanum lycopersicum
+          - Rat
+          - Rattus norvegicus
+          - Cow
+          - Bos taurus
+          - Western Balsam Poplar
+          - Populus trichocarpa
+          - Chimpanzee
+          - Pan troglodytes
+          - Indian Rice
+          - Oryza indica
+          - Dog
+          - Canis familiaris
+          - Maize
+          - Zea mays
+          - Pig
+          - Sus scrofa
+          - Worm
+          - Caenorhabditis elegans
+          - Platypus
+          - Ornithorhynchus anatinus
+          - Chicken
+          - Gallus gallus
+          - Fusarium graminearum
+          - Gibberella zeae
+          - Bacillus subtilis
+          - Escherichia coli
+          - Black mold
+          - Aspergillus niger
+          - Mouse
+          - Mus musculus
+      XrefBatchInput:
+        type: string
+        description: TAB separated values with one identifier/system code combination per line
+        example: |-
+          Q90038963	Wd
+          P0DTD1-PRO_0000449625	S
+          ENSMUSG00000032462	En
