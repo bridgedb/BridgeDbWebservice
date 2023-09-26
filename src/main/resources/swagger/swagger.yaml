@@ -30,8 +30,7 @@ paths:
         - name: organism
           in: path
           required: true
-          description: Organism [Latin name](http://vocabularies.bridgedb.org/#latinName)
-            or [short name](http://vocabularies.bridgedb.org/#shortName).
+          description: Organism (Latin name or short name).
           schema:
             $ref: '#/components/schemas/Organism'
         - name: systemCode
@@ -66,8 +65,7 @@ paths:
         - name: organism
           in: path
           required: true
-          description: Organism [Latin name](http://vocabularies.bridgedb.org/#latinName)
-            or [short name](http://vocabularies.bridgedb.org/#shortName).
+          description: Organism (Latin name or short name).
           schema:
             $ref: '#/components/schemas/Organism'
       requestBody:
@@ -95,8 +93,7 @@ paths:
         - name: organism
           in: path
           required: true
-          description: Organism [Latin name](http://vocabularies.bridgedb.org/#latinName)
-            or [short name](http://vocabularies.bridgedb.org/#shortName).
+          description: Organism (Latin name or short name).
           schema:
             $ref: '#/components/schemas/Organism'
         - name: systemCode
@@ -130,8 +127,7 @@ paths:
         - name: organism
           in: path
           required: true
-          description: Organism [Latin name](http://vocabularies.bridgedb.org/#latinName)
-            or [short name](http://vocabularies.bridgedb.org/#shortName).
+          description: Organism (Latin name or short name).
           schema:
             $ref: '#/components/schemas/Organism'
         - name: systemCode
@@ -165,8 +161,7 @@ paths:
         - name: organism
           in: path
           required: true
-          description: Organism [Latin name](http://vocabularies.bridgedb.org/#latinName)
-            or [short name](http://vocabularies.bridgedb.org/#shortName).
+          description: Organism (Latin name or short name).
           schema:
             $ref: '#/components/schemas/Organism'
         - name: query
@@ -195,8 +190,7 @@ paths:
         - name: organism
           in: path
           required: true
-          description: Organism [Latin name](http://vocabularies.bridgedb.org/#latinName)
-            or [short name](http://vocabularies.bridgedb.org/#shortName).
+          description: Organism (Latin name or short name).
           schema:
             $ref: '#/components/schemas/Organism'
         - name: query
@@ -225,8 +219,7 @@ paths:
         - name: organism
           in: path
           required: true
-          description: Organism [Latin name](http://vocabularies.bridgedb.org/#latinName)
-            or [short name](http://vocabularies.bridgedb.org/#shortName).
+          description: Organism (Latin name or short name).
           schema:
             $ref: '#/components/schemas/Organism'
       responses:
@@ -248,8 +241,7 @@ paths:
         - name: organism
           in: path
           required: true
-          description: Organism [Latin name](http://vocabularies.bridgedb.org/#latinName)
-            or [short name](http://vocabularies.bridgedb.org/#shortName).
+          description: Organism (Latin name or short name).
           schema:
             $ref: '#/components/schemas/Organism'
       responses:
@@ -271,8 +263,7 @@ paths:
         - name: organism
           in: path
           required: true
-          description: Organism [Latin name](http://vocabularies.bridgedb.org/#latinName)
-            or [short name](http://vocabularies.bridgedb.org/#shortName).
+          description: Organism (Latin name or short name).
           schema:
             $ref: '#/components/schemas/Organism'
       responses:
@@ -294,8 +285,7 @@ paths:
         - name: organism
           in: path
           required: true
-          description: Organism [Latin name](http://vocabularies.bridgedb.org/#latinName)
-            or [short name](http://vocabularies.bridgedb.org/#shortName).
+          description: Organism (Latin name or short name).
           schema:
             $ref: '#/components/schemas/Organism'
       responses:
@@ -317,8 +307,7 @@ paths:
         - name: organism
           in: path
           required: true
-          description: Organism [Latin name](http://vocabularies.bridgedb.org/#latinName)
-            or [short name](http://vocabularies.bridgedb.org/#shortName).
+          description: Organism (Latin name or short name).
           schema:
             $ref: '#/components/schemas/Organism'
         - name: sourceSystemCode
@@ -352,8 +341,7 @@ paths:
         - name: organism
           in: path
           required: true
-          description: Organism [Latin name](http://vocabularies.bridgedb.org/#latinName)
-            or [short name](http://vocabularies.bridgedb.org/#shortName).
+          description: Organism (Latin name or short name).
           schema:
             $ref: '#/components/schemas/Organism'
       responses:
@@ -375,8 +363,7 @@ paths:
         - name: organism
           in: path
           required: true
-          description: Organism [Latin name](http://vocabularies.bridgedb.org/#latinName)
-            or [short name](http://vocabularies.bridgedb.org/#shortName).
+          description: Organism (Latin name or short name).
           schema:
             $ref: '#/components/schemas/Organism'
         - name: systemCode
