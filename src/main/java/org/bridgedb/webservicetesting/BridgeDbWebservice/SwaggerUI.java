@@ -14,6 +14,8 @@
 //
 package org.bridgedb.webservicetesting.BridgeDbWebservice;
 
+import java.util.Properties;
+
 import org.restlet.data.MediaType;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
@@ -30,8 +32,19 @@ public class SwaggerUI extends RestletResource{
 		String foo = getReference().getLastSegment();
 		try {
 			if (foo == null) foo = "index.html";
+
 			String content = new String(SwaggerUI.class.getResourceAsStream("/swagger/" + foo).readAllBytes());
+
+			// customize the content for the version service
+			if ("swagger.yaml".equals(foo)) {
+				Properties props = new Properties();
+				props.load(RestletServer.class.getClassLoader().getResourceAsStream("webservice.props"));
+			    String version = props.getProperty("webservice.version");
+			    content = content.replaceAll("%%BRIDGEDB-WEBSERVICE-VERSION%%", version);
+			}
+
 			StringRepresentation sr = new StringRepresentation(content);
+			// set the proper MIME types
 			if (foo.endsWith(".html")) sr.setMediaType(MediaType.TEXT_HTML);
 			if (foo.endsWith(".js")) sr.setMediaType(MediaType.APPLICATION_JAVASCRIPT);
 			if (foo.endsWith(".css")) sr.setMediaType(MediaType.TEXT_CSS);

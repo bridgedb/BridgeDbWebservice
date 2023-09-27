@@ -19,6 +19,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Properties;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -60,6 +61,10 @@ public class SwaggerUITest {
     public void testSwaggerYAML() throws Exception {
     	String reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/swagger.yaml");
         assertTrue(reply.contains("openapi: 3"));
+		Properties props = new Properties();
+		props.load(RestletServer.class.getClassLoader().getResourceAsStream("webservice.props"));
+	    String version = props.getProperty("webservice.version");
+        assertTrue(reply.contains("version: " + version));
     }
     
     @Test

@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  version: 1.0.1
+  version: %%BRIDGEDB-WEBSERVICE-VERSION%%
   title: BridgeDb Webservices
   description: |-
     These are the BridgeDb Webservices for identifier to identifier mapping.
