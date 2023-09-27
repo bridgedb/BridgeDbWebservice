@@ -3,7 +3,7 @@ info:
   version: %%BRIDGEDB-WEBSERVICE-VERSION%%
   title: BridgeDb Webservices
   description: |-
-    These are the BridgeDb Webservices for identifier to identifier mapping.
+    These are the [BridgeDb Webservices](https://github.com/bridgedb/BridgeDbWebservice) for identifier to identifier mapping.
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
