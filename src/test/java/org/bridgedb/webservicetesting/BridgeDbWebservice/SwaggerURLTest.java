@@ -25,7 +25,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-public class SwaggerUITest {
+public class SwaggerURLTest {
 
 	private static int port = 1074;
 	private static RestletServer server;
@@ -42,41 +42,19 @@ public class SwaggerUITest {
         outputStream.close();
 
         // set up the REST service
-        SwaggerUITest.server = new RestletServer();
-        SwaggerUITest.server.run(port, configFile, false, false, null);
+        SwaggerURLTest.server = new RestletServer();
+        SwaggerURLTest.server.run(port, configFile, false, false, "https://example.org/");
     }
 
     @AfterAll
     public static void stopServer() {
-        SwaggerUITest.server.stop();
+        SwaggerURLTest.server.stop();
     }
 
     @Test
-    public void testIndexHTML() throws Exception {
-    	String reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/");
-        assertTrue(reply.contains("<head"));
-    }
-    
-    @Test
-    public void testSwaggerYAML() throws Exception {
-    	String reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/swagger.yaml");
-        assertTrue(reply.contains("openapi: 3"));
-		Properties props = new Properties();
-		props.load(RestletServer.class.getClassLoader().getResourceAsStream("webservice.props"));
-	    String version = props.getProperty("webservice.version");
-        assertTrue(reply.contains("version: " + version));
-    }
-    
-    @Test
-    public void testCSS() throws Exception {
-    	String reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/index.css");
-        assertTrue(reply.contains("html {"));
-    }
-
-    @Test
-    public void testJavaScript() throws Exception {
-    	String reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/swagger-initializer.js");
-        assertTrue(reply.contains("window.onload = function() {"));
+    public void testServerURL() throws Exception {
+        String reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/swagger.yaml");
+        assertTrue(reply.contains("url: https://example.org"));
     }
 
 }
