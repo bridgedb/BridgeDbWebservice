@@ -42,6 +42,14 @@ Navigating to the folder where you saved the jar file and run the following line
 java -jar target/BridgeDbWebservice-*-jar-with-dependencies.jar
 ```
 
+The jar file takes three optional parameters, the port, a boolean if CORS should be enabled, and the server URL.
+For example, the following the are valid instructions to start a server:
+
+```bash
+java -jar target/BridgeDbWebservice-*-jar-with-dependencies.jar 8888
+java -jar target/BridgeDbWebservice-*-jar-with-dependencies.jar 8888 false https://example.org/
+```
+
 ### Testing an endpoint
 
 Point your browser to: http://localhost:8080/Human/attributeSet

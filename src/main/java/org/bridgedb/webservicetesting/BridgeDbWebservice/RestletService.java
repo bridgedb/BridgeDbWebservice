@@ -40,6 +40,7 @@ public class RestletService extends Application{
 
 	public final File configFile;
 	private boolean transitive;
+	protected String SERVER_URL = null;
 	
 	public static final String URL_PROPERTIES = "/{" + PAR_ORGANISM + "}/properties";
 	public static final String URL_DATASOURCES = "/" + PAR_DATASOURCES;
@@ -77,8 +78,9 @@ public class RestletService extends Application{
 	
 	private GdbProvider gdbProvider;
 	
-	public RestletService(File aConfigFile, boolean transitive, boolean cors)
+	public RestletService(File aConfigFile, boolean transitive, boolean cors, String serverURL)
 	{
+		this.SERVER_URL = serverURL;
 		this.transitive = transitive;
 		if (aConfigFile == null)
 		{

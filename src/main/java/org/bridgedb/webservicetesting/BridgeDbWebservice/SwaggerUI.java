@@ -42,6 +42,13 @@ public class SwaggerUI extends RestletResource{
 			    String version = props.getProperty("webservice.version");
 			    content = content.replaceAll("%%BRIDGEDB-WEBSERVICE-VERSION%%", version);
 			}
+			// customize the server URL
+			if ("swagger.yaml".equals(foo)) {
+				String serverURL = ((RestletService)getApplication()).SERVER_URL;
+				System.out.println("Server URL: " + serverURL);
+				if (serverURL != null)
+					content = content.replaceAll("%%BRIDGEDB-SERVER-URL%%", serverURL);
+			}
 
 			StringRepresentation sr = new StringRepresentation(content);
 			// set the proper MIME types

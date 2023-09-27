@@ -13,9 +13,14 @@ public class RestletServer {
 
 	public void run(int port, File configFile, boolean transitive, boolean cors)
 	{
+		run(port, configFile, transitive, cors, null);
+	}
+
+	public void run(int port, File configFile, boolean transitive, boolean cors, String serverURL)
+	{
 		component = new Component();
 		component.getServers().add(Protocol.HTTP, port);
-		component.getDefaultHost().attach(new RestletService(configFile, transitive, cors));
+		component.getDefaultHost().attach(new RestletService(configFile, transitive, cors, serverURL));
 		try {
 			System.out.println ("Starting server on port " + port);
 			component.start();
@@ -46,15 +51,17 @@ public class RestletServer {
     		Class.forName ("org.bridgedb.rdb.IDMapperRdb");
     		int port = 8080; // default port
     		boolean cors = true;
+    		String serverURL = null;
     		if(args.length > 0) port = Integer. parseInt(args[0]);
     		if(args.length > 1) cors = !("false".equals(args[1]));
+    		if(args.length > 2) serverURL = args[2];
     		boolean transitive = false;
 
     		File configFile = new File("./gdb.config");
 
     		RestletServer server = new RestletServer();
 
-    		server.run (port, configFile, transitive, cors);
+    		server.run (port, configFile, transitive, cors, serverURL);
     	}
     }
 }

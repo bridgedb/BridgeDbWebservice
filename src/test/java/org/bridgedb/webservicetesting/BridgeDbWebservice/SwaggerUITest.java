@@ -43,7 +43,7 @@ public class SwaggerUITest {
 
         // set up the REST service
         SwaggerUITest.server = new RestletServer();
-        SwaggerUITest.server.run(port, configFile, false, false);
+        SwaggerUITest.server.run(port, configFile, false, false, null);
     }
 
     @AfterAll
@@ -72,11 +72,19 @@ public class SwaggerUITest {
     	String reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/index.css");
         assertTrue(reply.contains("html {"));
     }
-    
+
     @Test
     public void testJavaScript() throws Exception {
     	String reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/swagger-initializer.js");
         assertTrue(reply.contains("window.onload = function() {"));
     }
-    
+
+    @Test
+    public void testServerURL() throws Exception {
+        SwaggerUITest.server = new RestletServer();
+        SwaggerUITest.server.run(port+1, null, false, false, "https://example.org/");
+        String reply =  TestHelper.getContent("http://127.0.0.1:" + (port+1) + "/swagger.yaml");
+        assertTrue(reply.contains("url: https://example.org"));
+    }
+
 }

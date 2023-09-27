@@ -8,7 +8,7 @@ info:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
 servers:
-  - url: https://webservice.bridgedb.org
+  - url: %%BRIDGEDB-SERVER-URL%%
 tags:
   - name: mappings
     description: Identifier mapping services for gene products, like genes, RNA, and proteins, nutrients, hormones, vitamins, peptides, and chemical copmounds from the exposome
