@@ -45,9 +45,11 @@ public class SwaggerUI extends RestletResource{
 			// customize the server URL
 			if ("swagger.yaml".equals(foo)) {
 				String serverURL = ((RestletService)getApplication()).SERVER_URL;
-				System.out.println("Server URL: " + serverURL);
-				if (serverURL != null)
+				if (serverURL != null) {
 					content = content.replaceAll("%%BRIDGEDB-SERVER-URL%%", serverURL);
+				} else {
+					content = content.replaceAll("%%BRIDGEDB-SERVER-URL%%", "https://webservice.bridgedb.org/");
+				}
 			}
 
 			StringRepresentation sr = new StringRepresentation(content);
