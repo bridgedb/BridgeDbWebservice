@@ -23,8 +23,8 @@
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
     <restlet-version>2.3.7</restlet-version>
-    <bridgedb-version>3.0.23</bridgedb-version>
-    <junit.version>5.10.0</junit.version>
+    <bridgedb-version>3.0.25</bridgedb-version>
+    <junit.version>5.10.1</junit.version>
   </properties>
 
   <dependencies>
@@ -84,7 +84,7 @@
 	<dependency>
 	    <groupId>org.json</groupId>
 	    <artifactId>json</artifactId>
-	    <version>20230618</version>
+	    <version>20231013</version>
 	</dependency>
 	<dependency>
         <groupId>com.google.code.gson</groupId>
