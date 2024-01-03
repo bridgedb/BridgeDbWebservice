@@ -54,6 +54,7 @@ public class Batch extends RestletResource {
 		return result;
 	}
 
+	@Post
 	public Representation multiDataSource(Representation entity, Variant variant) {
     	if (!supportedOrganism(urlDecode((String) getRequest().getAttributes().get(RestletService.PAR_ORGANISM)))) {
 			String error = UNSUPPORTED_ORGANISM_TEMPLATE.replaceAll("%%ORGANISM%%", (String) getRequest().getAttributes().get(RestletService.PAR_ORGANISM));
