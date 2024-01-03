@@ -253,7 +253,7 @@ public class RestletServerTest {
     @Test
     public void testDatasources() throws Exception {
         String reply = TestHelper.getContent("http://127.0.0.1:" + port + "/datasources");
-        assertFalse(reply.contains("{"));
+        assertFalse(reply.trim().startsWith("{"));
         assertTrue(reply.contains("KNApSAcK"));
     }
 

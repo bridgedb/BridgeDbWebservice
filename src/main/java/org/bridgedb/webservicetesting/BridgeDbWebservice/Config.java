@@ -14,7 +14,7 @@ import org.restlet.resource.ServerResource;
 
 public class Config extends ServerResource {
 	
-	@Get("json")
+	@Get
 	public Representation get(Variant variant) {
 		try {
 			Properties props = new Properties();

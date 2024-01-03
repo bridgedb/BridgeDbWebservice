@@ -38,7 +38,7 @@ public class Attributes extends RestletResource {
 			throw new ResourceException(e);
 		}
 	}
-	@Get("json")
+	@Get
 	public Representation getAttributes(Variant variant) {
     	if (!supportedOrganism(urlDecode((String) getRequest().getAttributes().get(RestletService.PAR_ORGANISM)))) {
 			String error = UNSUPPORTED_ORGANISM_TEMPLATE.replaceAll("%%ORGANISM%%", (String) getRequest().getAttributes().get(RestletService.PAR_ORGANISM));

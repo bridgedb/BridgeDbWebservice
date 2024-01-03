@@ -12,7 +12,7 @@ import org.restlet.resource.Get;
 
 public class Contents extends RestletResource {
 
-	@Get("json")
+	@Get
 	public Representation get(Variant variant) {
 		if (getGdbProvider().getOrganisms().size() == 0) {
 			return new StringRepresentation("\n");

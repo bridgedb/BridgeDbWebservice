@@ -15,9 +15,8 @@ import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
 
 public class DataSources extends ServerResource{
-	
-	
-	@Get("json")
+
+	@Get
 	public Representation get(Variant variant) {
 		if(MediaType.APPLICATION_JSON.isCompatible(variant.getMediaType())){
 			String datasourcesTxt = "";

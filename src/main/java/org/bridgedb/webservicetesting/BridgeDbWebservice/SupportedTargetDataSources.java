@@ -15,7 +15,7 @@ import org.restlet.resource.Get;
 
 public class SupportedTargetDataSources extends RestletResource {
 
-	@Get("json")
+	@Get
 	public Representation get(Variant variant) {
     	if (!supportedOrganism(urlDecode((String) getRequest().getAttributes().get(RestletService.PAR_ORGANISM)))) {
 			String error = UNSUPPORTED_ORGANISM_TEMPLATE.replaceAll("%%ORGANISM%%", (String) getRequest().getAttributes().get(RestletService.PAR_ORGANISM));
