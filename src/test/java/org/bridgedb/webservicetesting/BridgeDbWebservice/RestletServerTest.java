@@ -201,6 +201,13 @@ public class RestletServerTest {
     }
 
     @Test
+    public void testIsMappingSupported_UnsupportedSpecies() throws Exception {
+        String reply = TestHelper.getContent("http://127.0.0.1:" + port + "/Catz/isMappingSupported/Wd/S");
+        assertTrue(reply.contains("<html>"));
+        assertTrue(reply.contains("Unknown organism"));
+    }
+
+    @Test
     public void testAtributeSet() throws Exception {
         String reply = TestHelper.getContent("http://127.0.0.1:" + port + "/Human/attributeSet");
         assertTrue(reply.contains("virus"));
@@ -240,12 +247,20 @@ public class RestletServerTest {
     public void testIsFreeSearchSupported() throws Exception {
         String reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/Human/isFreeSearchSupported");
         assertEquals("true", reply);
+
+        reply = TestHelper.getContent("http://127.0.0.1:" + port + "/Parrot/isFreeSearchSupported");
+        assertTrue(reply.contains("Double check the spelling. We are expecting an entry like"));
+        assertTrue(reply.contains("Parrot"));
     }
 
     @Test
     public void testAttributeSearch() throws Exception {
     	TestHelper.getContent("http://127.0.0.1:" + port + "/Human/attributeSearch/virus");
     	// does not return anything right now, bc the test file does not have synonyms
+
+        String reply = TestHelper.getContent("http://127.0.0.1:" + port + "/Parrot/attributeSearch/virus");
+        assertTrue(reply.contains("Double check the spelling. We are expecting an entry like"));
+        assertTrue(reply.contains("Parrot"));
     }
 
     @Test

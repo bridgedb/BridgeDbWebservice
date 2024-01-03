@@ -201,4 +201,65 @@ public class RestletServerJSONTest {
         assertTrue(thrown.getMessage().contains("not found"));
     }
 
+    @Test
+    public void testIsFreeSearchSupported() throws Exception {
+        String reply =  TestHelper.getJSONContent("http://127.0.0.1:" + port + "/Human/isFreeSearchSupported");
+        assertTrue(reply.contains("true"));
+
+        // test if the JSON can be parsed
+        JSONTokener tokener = new JSONTokener(reply);
+        JSONObject root = new JSONObject(tokener);
+    }
+
+    @Test
+    public void testConfig() throws Exception {
+        String reply = TestHelper.getJSONContent("http://127.0.0.1:" + port + "/config");
+        assertTrue(reply.contains("java.version"));
+        assertTrue(reply.contains("bridgedb.version"));
+        assertTrue(reply.contains("webservice.version"));
+
+        // test if the JSON can be parsed
+        JSONTokener tokener = new JSONTokener(reply);
+        JSONObject root = new JSONObject(tokener);
+    }
+
+	@Test
+	public void testAttributeSearch() throws Exception {
+		String reply = TestHelper.getJSONContent("http://127.0.0.1:" + port + "/Human/attributeSearch/virus");
+		assertNotNull(reply);
+		// does not return anything right now, bc the test file does not have synonyms
+	}
+
+    @Test
+    public void testTargets_UnknownSpecies() throws Exception {
+        String reply = TestHelper.getJSONContent("http://127.0.0.1:" + port + "/Catz/targetDataSources");
+        assertTrue(reply.contains("Unknown organism"));
+    }
+
+    @Test
+    public void testXrefExists() throws Exception {
+    	String reply =  TestHelper.getJSONContent("http://127.0.0.1:" + port + "/Human/xrefExists/Wd/Q90038963");
+        assertTrue(reply.contains("true"));
+    	reply =  TestHelper.getJSONContent("http://127.0.0.1:" + port + "/Human/xrefExists/Wd/Q0");
+        assertTrue(reply.contains("false"));
+    }
+
+    @Test
+    public void testIsMappingSupported_UnsupportedSpecies() throws Exception {
+        String reply = TestHelper.getJSONContent("http://127.0.0.1:" + port + "/Catz/isMappingSupported/Wd/S");
+        assertTrue(reply.contains("Unknown organism"));
+    }
+
+    @Test
+    public void testSearch() throws Exception {
+        TestHelper.getJSONContent("http://127.0.0.1:" + port + "/Human/search/virus");
+        // does not return anything right now, bc the test file does not have synonyms
+    }
+
+    @Test
+    public void testSearch_UnsupportedSpecies() throws Exception {
+        String reply = TestHelper.getJSONContent("http://127.0.0.1:" + port + "/Catz/search/virus");
+        assertTrue(reply.contains("Unknown organism"));
+    }
+
 }
