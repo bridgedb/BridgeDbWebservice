@@ -70,6 +70,7 @@ public class RestletServerTest {
     @Test
     public void testProperties() throws Exception {
     	String reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/Human/properties");
+        assertFalse(reply.contains("{"));
         assertTrue(reply.contains("DATASOURCENAME"));
     }
 
@@ -83,6 +84,7 @@ public class RestletServerTest {
     @Test
     public void testSources() throws Exception {
     	String reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/Human/sourceDataSources");
+        assertFalse(reply.contains("{"));
         assertTrue(reply.contains("Wikidata"));
     }
 
@@ -96,6 +98,7 @@ public class RestletServerTest {
     @Test
     public void testTargets() throws Exception {
     	String reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/Human/targetDataSources");
+        assertFalse(reply.contains("{"));
         assertTrue(reply.contains("Wikidata"));
     }
 
@@ -109,8 +112,10 @@ public class RestletServerTest {
     @Test
     public void testXrefExists() throws Exception {
     	String reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/Human/xrefExists/Wd/Q90038963");
+        assertFalse(reply.contains("{"));
         assertTrue(reply.equals("true"));
     	reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/Human/xrefExists/Wd/Q0");
+        assertFalse(reply.contains("{"));
         assertTrue(reply.equals("false"));
     }
 
@@ -124,6 +129,7 @@ public class RestletServerTest {
     @Test
     public void testXrefs() throws Exception {
     	String reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/Human/xrefs/Wd/Q90038963");
+        assertFalse(reply.contains("{"));
         assertTrue(reply.contains("Wikidata"));
         assertTrue(reply.contains("P0DTD1-PRO_0000449625"));
     }
@@ -138,6 +144,7 @@ public class RestletServerTest {
     @Test
     public void testXrefs_DataSource() throws Exception {
     	String reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/Human/xrefs/Wd/Q90038963?dataSource=S");
+        assertFalse(reply.contains("{"));
         assertFalse(reply.contains("Wikidata"));
         assertTrue(reply.contains("P0DTD1-PRO_0000449625"));
     }
@@ -145,6 +152,7 @@ public class RestletServerTest {
     @Test
     public void testNoBioregistry() throws Exception {
     	String reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/Human/xrefs/Wd/Q90038963");
+        assertFalse(reply.contains("{"));
         assertFalse(reply.contains("wikidata:Q90038963"));
     }
 
@@ -153,6 +161,7 @@ public class RestletServerTest {
         String requestBody = "Q90038963\tWd\n"
         		+ "P0DTD1-PRO_0000449625\tS\n";
         String reply = TestHelper.postContent("http://127.0.0.1:" + port + "/Human/xrefsBatch", requestBody);
+        assertFalse(reply.contains("{"));
         assertTrue(reply.contains("S:P0DTD1-PRO_0000449625"));
         assertTrue(reply.contains("Wd:Q90038963"));
         assertFalse(reply.contains(":T"));
@@ -172,6 +181,7 @@ public class RestletServerTest {
     public void testXrefsBatch_DataSource() throws Exception {
         String requestBody = "Q90038963\n";
         String reply = TestHelper.postContent("http://127.0.0.1:" + port + "/Human/xrefsBatch/Wd", requestBody);
+        assertFalse(reply.contains("{"));
         assertTrue(reply.contains("S:P0DTD1-PRO_0000449625"));
         assertTrue(reply.contains("Wd:Q90038963"));
         assertFalse(reply.contains(":T"));
@@ -181,6 +191,7 @@ public class RestletServerTest {
     @Test
     public void testAttributes() throws Exception {
         String reply = TestHelper.getContent("http://127.0.0.1:" + port + "/Human/attributes/Wd/Q90038963");
+        assertFalse(reply.contains("{"));
         assertTrue(reply.contains("virus"));
         assertTrue(reply.contains("SARS-CoV-2"));
     }
@@ -210,6 +221,7 @@ public class RestletServerTest {
     @Test
     public void testAtributeSet() throws Exception {
         String reply = TestHelper.getContent("http://127.0.0.1:" + port + "/Human/attributeSet");
+        assertFalse(reply.contains("{"));
         assertTrue(reply.contains("virus"));
     }
 
@@ -226,6 +238,7 @@ public class RestletServerTest {
     @Test
     public void testConfig() throws Exception {
         String reply = TestHelper.getContent("http://127.0.0.1:" + port + "/config");
+        assertFalse(reply.contains("{"));
         assertTrue(reply.contains("java.version"));
         assertTrue(reply.contains("bridgedb.version"));
         assertTrue(reply.contains("webservice.version"));
@@ -240,12 +253,14 @@ public class RestletServerTest {
     @Test
     public void testDatasources() throws Exception {
         String reply = TestHelper.getContent("http://127.0.0.1:" + port + "/datasources");
+        assertFalse(reply.contains("{"));
         assertTrue(reply.contains("KNApSAcK"));
     }
 
     @Test
     public void testIsFreeSearchSupported() throws Exception {
         String reply =  TestHelper.getContent("http://127.0.0.1:" + port + "/Human/isFreeSearchSupported");
+        assertFalse(reply.contains("{"));
         assertEquals("true", reply);
 
         reply = TestHelper.getContent("http://127.0.0.1:" + port + "/Parrot/isFreeSearchSupported");
