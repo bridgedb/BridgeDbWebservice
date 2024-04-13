@@ -47,8 +47,8 @@ public class Bioregistry extends RestletResource {
 		}
 	}
 	
-	@Get
-	public Representation get(Variant variant) {
+	@Get("json")
+	public Representation getJSON(Variant variant) {
     	if (!supportedOrganism(urlDecode((String) getRequest().getAttributes().get(RestletService.PAR_ORGANISM)))) {
 			String error = UNSUPPORTED_ORGANISM_TEMPLATE.replaceAll("%%ORGANISM%%", (String) getRequest().getAttributes().get(RestletService.PAR_ORGANISM));
 			StringRepresentation sr = new StringRepresentation(error);
@@ -73,7 +73,7 @@ public class Bioregistry extends RestletResource {
 				xrefs = mapper.mapID(xref);
 			else
 				xrefs = mapper.mapID(xref, targetDs);
-			if(MediaType.APPLICATION_JSON.isCompatible(variant.getMediaType())){
+
 		        JSONObject jsonObject = new JSONObject();
 				for(Xref x : xrefs) {
 					if (targetSystemCode == null ||
@@ -82,8 +82,41 @@ public class Bioregistry extends RestletResource {
 					}
 				}
 				return new StringRepresentation(jsonObject.toString());
-			}
-			else {
+
+		} catch(Exception e) {
+			e.printStackTrace();
+			setStatus(Status.SERVER_ERROR_INTERNAL);
+			return new StringRepresentation(e.getMessage());
+		}
+	}
+
+	@Get("txt")
+	public Representation getTxt(Variant variant) {
+    	if (!supportedOrganism(urlDecode((String) getRequest().getAttributes().get(RestletService.PAR_ORGANISM)))) {
+			String error = UNSUPPORTED_ORGANISM_TEMPLATE.replaceAll("%%ORGANISM%%", (String) getRequest().getAttributes().get(RestletService.PAR_ORGANISM));
+			StringRepresentation sr = new StringRepresentation(error);
+			sr.setMediaType(MediaType.TEXT_HTML);
+			return sr;
+    	}
+
+    	String targetSystemCode = null;
+    	Form form = getRequest().getResourceRef().getQueryAsForm();
+        for (Parameter parameter : form) {
+    		if ("dataSource".equals(parameter.getName())) {
+    			targetSystemCode = parameter.getValue();
+    		}
+    	}
+    	
+//    	System.out.println( "Xrefs.getXrefs() start" );
+		try {
+			//The result set
+			IDMapper mapper = getIDMappers();
+			Set<Xref> xrefs;
+			if (targetDs == null)
+				xrefs = mapper.mapID(xref);
+			else
+				xrefs = mapper.mapID(xref, targetDs);
+
 			    StringBuilder result = new StringBuilder();
 			    for(Xref x : xrefs) {
 			        if (targetSystemCode == null ||
@@ -95,7 +128,6 @@ public class Bioregistry extends RestletResource {
 			        }
 			    }
 			    return new StringRepresentation(result.toString());
-			}
 		} catch(Exception e) {
 			e.printStackTrace();
 			setStatus(Status.SERVER_ERROR_INTERNAL);
@@ -103,6 +135,54 @@ public class Bioregistry extends RestletResource {
 		}
 	}
 
+	@Get("html")
+	public Representation getHtml(Variant variant) {
+    	if (!supportedOrganism(urlDecode((String) getRequest().getAttributes().get(RestletService.PAR_ORGANISM)))) {
+			String error = UNSUPPORTED_ORGANISM_TEMPLATE.replaceAll("%%ORGANISM%%", (String) getRequest().getAttributes().get(RestletService.PAR_ORGANISM));
+			StringRepresentation sr = new StringRepresentation(error);
+			sr.setMediaType(MediaType.TEXT_HTML);
+			return sr;
+    	}
 
+    	String targetSystemCode = null;
+    	Form form = getRequest().getResourceRef().getQueryAsForm();
+        for (Parameter parameter : form) {
+    		if ("dataSource".equals(parameter.getName())) {
+    			targetSystemCode = parameter.getValue();
+    		}
+    	}
+    	
+//    	System.out.println( "Xrefs.getXrefs() start" );
+		try {
+			//The result set
+			IDMapper mapper = getIDMappers();
+			Set<Xref> xrefs;
+			if (targetDs == null)
+				xrefs = mapper.mapID(xref);
+			else
+				xrefs = mapper.mapID(xref, targetDs);
 
+			    StringBuilder result = new StringBuilder();
+			    result.append("<html>\n");
+			    result.append("<body>\n");
+			    result.append("<h1>Mappings for </h1>\n");
+			    result.append("<ul>\n");
+			    for(Xref x : xrefs) {
+			        if (targetSystemCode == null ||
+			        	targetSystemCode.equals(x.getDataSource().getSystemCode())) {
+			            result.append("  <li><a href=\"https://bioregistry.org/").append(x.getBioregistryIdentifier());
+			            result.append("\">").append(x.getBioregistryIdentifier());
+			            result.append("</a> (" + x.getDataSource().getFullName()+ ")</li>\n");
+			        }
+			    }
+			    result.append("</ul>\n");
+			    result.append("</body>\n");
+			    result.append("</html>\n");
+			    return new StringRepresentation(result.toString(), MediaType.TEXT_HTML);
+		} catch(Exception e) {
+			e.printStackTrace();
+			setStatus(Status.SERVER_ERROR_INTERNAL);
+			return new StringRepresentation(e.getMessage());
+		}
+	}
 }

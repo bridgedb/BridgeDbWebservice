@@ -44,6 +44,16 @@ public class TestHelper {
         return buffer.toString();
     }
 
+	public static String getHTMLContent(String url) throws Exception {
+        URL queryURL = new URL(url);
+        HttpURLConnection connection = (HttpURLConnection)queryURL.openConnection();
+        connection.setRequestProperty("Accept", "text/html");
+        InputStream input = connection.getInputStream();
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        input.transferTo(buffer);
+        return buffer.toString();
+	}
+
     public static String getContent(String url) throws Exception {
     	return getPlainTextContent(url);
     }
@@ -70,5 +80,5 @@ public class TestHelper {
                 HttpResponse.BodyHandlers.ofString());
         return response.body();
     }
-    
+
 }
