@@ -262,4 +262,16 @@ public class RestletServerJSONTest {
         assertTrue(reply.contains("Unknown organism"));
     }
 
+    @Test
+    public void testBioregistryMappings() throws Exception {
+    	String reply = TestHelper.getJSONContent("http://127.0.0.1:" + port + "/Human/xrefs/wikidata:Q90038963");
+    	assertTrue(reply.contains("Wikidata"));
+        assertTrue(reply.contains("P0DTD1-PRO_0000449625"));
+
+        JSONTokener tokener = new JSONTokener(reply);
+        JSONObject root = new JSONObject(tokener);
+        assertEquals("Wikidata", root.get("wikidata:Q90038963"));
+        assertEquals("Uniprot-TrEMBL", root.get("uniprot:P0DTD1-PRO_0000449625"));
+    }
+
 }

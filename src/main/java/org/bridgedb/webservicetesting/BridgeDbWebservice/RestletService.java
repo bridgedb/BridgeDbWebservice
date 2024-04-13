@@ -28,6 +28,7 @@ public class RestletService extends Application{
 	public static final String PAR_ORGANISM = "organism";
 	public static final String PAR_ID = "id";
 	public static final String PAR_SYSTEM = "system";
+	public static final String PAR_BIOREG_PREFIX = "bioregistry.prefix";
 	public static final String PAR_QUERY = "query";
 	public static final String PAR_DATASOURCES = "datasources";
 	public static final String PAR_TARGET_SYSTEM = "targetDs";
@@ -66,6 +67,8 @@ public class RestletService extends Application{
 	public static final String URL_XREFS_BATCH_TARGETDS_QUERY = "/{" + PAR_ORGANISM + "}/xrefsBatch/targetDs";
 	public static final String URL_XREFS_BATCH_SOURCE_TARGETDS_QUERY = "/{" + PAR_ORGANISM + "}/xrefsBatch/{" + PAR_SYSTEM +"}/"+PAR_TARGET_SYSTEM;
 	public static final String URL_XREFS_BATCH_SOURCE = "/{" + PAR_ORGANISM + "}/xrefsBatch/{" + PAR_SYSTEM +"}";
+	
+	public static final String URL_BIOREG_XREFS = "/{" + PAR_ORGANISM + "}/xrefs/{" + PAR_BIOREG_PREFIX + "}:{" + PAR_ID + "}";
 
 	public static final String URL_HOME = "/";
 	public static final String URL_SWAGGER_YAML = "/swagger.yaml";
@@ -166,6 +169,9 @@ public class RestletService extends Application{
 		Route xrefsRoute = router.attach(URL_XREFS, Xrefs.class);
 		router.attach(URL_XREFS_TARGET, Xrefs.class);
 		router.attach(URL_XREF_EXISTS, XrefExists.class);
+
+		//Register the route for the BioRegistry xrefs
+		Route compactIDsRoute = router.attach(URL_BIOREG_XREFS, Bioregistry.class);
 
         Extractor extractorBatch = new Extractor(getContext()); 
         extractorBatch.extractFromQuery(PAR_TARGET_SYSTEM, PAR_TARGET_SYSTEM, true);

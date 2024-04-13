@@ -290,4 +290,11 @@ public class RestletServerTest {
     	// does not return anything right now, bc the test file does not have synonyms
     }
 
+    @Test
+    public void testBioregistryMappings() throws Exception {
+    	String reply = TestHelper.getContent("http://127.0.0.1:" + port + "/Human/xrefs/wikidata:Q90038963");
+    	assertTrue(reply.contains("P0DTD1-PRO_0000449625"));
+    	assertTrue(reply.contains("Uniprot-TrEMBL"));
+    }
+
 }
