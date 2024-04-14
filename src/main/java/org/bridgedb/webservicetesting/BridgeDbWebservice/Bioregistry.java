@@ -165,7 +165,7 @@ public class Bioregistry extends RestletResource {
 			    StringBuilder result = new StringBuilder();
 			    result.append("<html>\n");
 			    result.append("<body>\n");
-			    result.append("<h1>Mappings for </h1>\n");
+			    result.append("<h1>Mappings for " + xref.getBioregistryIdentifier() + "</h1>\n");
 			    result.append("<ul>\n");
 			    for(Xref x : xrefs) {
 			        if (targetSystemCode == null ||
