@@ -13,7 +13,6 @@
 // limitations under the License.
 package org.bridgedb.webservicetesting.BridgeDbWebservice;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.BufferedOutputStream;
@@ -22,8 +21,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.json.JSONObject;
-import org.json.JSONTokener;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -67,7 +64,6 @@ public class RestletServerHTMLTest {
     @Test
     public void testBioregistryMappings() throws Exception {
     	String reply = TestHelper.getHTMLContent("http://127.0.0.1:" + port + "/Human/xrefs/wikidata:Q90038963");
-        System.out.println(reply);
     	assertTrue(reply.contains("html"));
         assertTrue(reply.contains("wikidata:Q90038963"));
     }
