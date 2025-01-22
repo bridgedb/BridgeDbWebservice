@@ -1,0 +1,33 @@
+name: run-tests
+
+on:
+  push:
+    #branches: [ main ]
+  pull_request:
+    #branches: [ main ]
+
+jobs:
+  test:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [ '11', '17' ]
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up JDK
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: ${{ matrix.java }}
+        cache: 'maven'
+    - name: Run Tests with Maven
+      run: mvn test
+
+    - name: Upload Test Results
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-results-${{ matrix.java }}
+        path: target/surefire-reports/*.xml
