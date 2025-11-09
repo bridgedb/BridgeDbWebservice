@@ -297,4 +297,20 @@ public class RestletServerTest {
     	assertTrue(reply.contains("Uniprot-TrEMBL"));
     }
 
+    @Test
+    public void testBioregistryMappings_BadPrefix() throws Exception {
+        IOException thrown = assertThrows(
+            IOException.class,
+              () -> TestHelper.getContent("http://127.0.0.1:" + port + "/Human/xrefs/wikizappa:Q90038963")
+            );
+        assertTrue(thrown.getMessage().contains("500 for URL"));
+        assertTrue(thrown.getMessage().contains("wikizappa:Q9003896"));
+    }
+
+    @Test
+    public void testBioregistryMappings_UnsupportedSpecies() throws Exception {
+    	String reply = TestHelper.getContent("http://127.0.0.1:" + port + "/Catz/xrefs/wikidata:Q90038963");
+        assertTrue(reply.contains("Unknown organism"));
+    }
+
 }

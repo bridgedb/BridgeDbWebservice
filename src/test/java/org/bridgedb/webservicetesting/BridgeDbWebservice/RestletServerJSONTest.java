@@ -284,4 +284,10 @@ public class RestletServerJSONTest {
         assertTrue(thrown.getMessage().contains("wikizappa:Q9003896"));
     }
 
+    @Test
+    public void testBioregistryMappings_UnsupportedSpecies() throws Exception {
+    	String reply = TestHelper.getJSONContent("http://127.0.0.1:" + port + "/Catz/xrefs/wikidata:Q90038963");
+        assertTrue(reply.contains("Unknown organism"));
+    }
+
 }
