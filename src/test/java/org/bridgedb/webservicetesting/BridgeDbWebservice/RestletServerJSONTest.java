@@ -274,4 +274,14 @@ public class RestletServerJSONTest {
         assertEquals("Uniprot-TrEMBL", root.get("uniprot:P0DTD1-PRO_0000449625"));
     }
 
+    @Test
+    public void testBioregistryMappings_BadPrefix() throws Exception {
+        IOException thrown = assertThrows(
+            IOException.class,
+              () -> TestHelper.getJSONContent("http://127.0.0.1:" + port + "/Human/xrefs/wikizappa:Q90038963")
+            );
+        assertTrue(thrown.getMessage().contains("500 for URL"));
+        assertTrue(thrown.getMessage().contains("wikizappa:Q9003896"));
+    }
+
 }
