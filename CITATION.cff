@@ -1,8 +1,8 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 title: BridgeDb Webservice
-version: 2.1.7
-date-released: 2024-01-03
+version: 2.1.8
+date-released: 2025-11-09
 url: "https://github.com/bridgedb/BridgeDbWebservice"
 preferred-citation:
   - type: article
