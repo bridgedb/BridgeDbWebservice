@@ -1,4 +1,4 @@
-// Copyright 2023 Egon Willighagen
+// Copyright 2023-2025 Egon Willighagen
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
 // limitations under the License.
 package org.bridgedb.webservicetesting.BridgeDbWebservice;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.BufferedOutputStream;
@@ -68,4 +69,19 @@ public class RestletServerHTMLTest {
         assertTrue(reply.contains("wikidata:Q90038963"));
     }
 
+    @Test
+    public void testBioregistryMappings_BadPrefix() throws Exception {
+        IOException thrown = assertThrows(
+            IOException.class,
+              () -> TestHelper.getHTMLContent("http://127.0.0.1:" + port + "/Human/xrefs/wikizappa:Q90038963")
+            );
+        assertTrue(thrown.getMessage().contains("500 for URL"));
+        assertTrue(thrown.getMessage().contains("wikizappa:Q9003896"));
+    }
+
+    @Test
+    public void testBioregistryMappings_UnsupportedSpecies() throws Exception {
+    	String reply = TestHelper.getHTMLContent("http://127.0.0.1:" + port + "/Catz/xrefs/wikidata:Q90038963");
+        assertTrue(reply.contains("Unknown organism"));
+    }
 }
