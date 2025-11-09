@@ -15,6 +15,7 @@
         <id>maven-restlet</id>
         <name>Restlet repository</name>
         <url>https://maven.restlet.talend.com/</url>
+        <layout>default</layout>
     </repository>
   </repositories>
 
