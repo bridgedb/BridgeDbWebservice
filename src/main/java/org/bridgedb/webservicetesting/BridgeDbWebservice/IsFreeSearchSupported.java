@@ -22,7 +22,7 @@ public class IsFreeSearchSupported extends RestletResource {
 		try {
 			IDMapper mapper = getIDMappers();
 			boolean isSupported = mapper.getCapabilities().isFreeSearchSupported();
-			if(MediaType.APPLICATION_JSON.isCompatible(variant.getMediaType())){
+			if(RestletResource.jsonRequested(getClientInfo())){
 				JSONObject jsonObject = new JSONObject();
 				jsonObject.put("isSupported", isSupported);
 				return new StringRepresentation(jsonObject.toString());

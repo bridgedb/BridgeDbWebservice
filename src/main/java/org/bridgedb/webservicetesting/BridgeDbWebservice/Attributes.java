@@ -60,7 +60,7 @@ public class Attributes extends RestletResource {
 	}
 	
 	private Representation getAttributesWithType(Variant variant) throws IDMapperException {
-		if(MediaType.APPLICATION_JSON.isCompatible(variant.getMediaType())){
+		if(RestletResource.jsonRequested(getClientInfo())){
 			IDMapperStack mapper = getIDMappers();
 			JSONObject jsonObject = new JSONObject();
 			Set<String> values = mapper.getAttributes(xref, attrType);
@@ -84,7 +84,7 @@ public class Attributes extends RestletResource {
 	private Representation getAttributesWithoutType(Variant variant) throws IDMapperException {
 		IDMapperStack mapper = getIDMappers();
 		Map<String, Set<String>> values = mapper.getAttributes(xref);
-		if(MediaType.APPLICATION_JSON.isCompatible(variant.getMediaType())){
+		if(RestletResource.jsonRequested(getClientInfo())){
 			JSONObject jsonObject = new JSONObject();
 			for(String attr : values.keySet()) {
 				for(String v : values.get(attr)) {

@@ -3,7 +3,6 @@ package org.bridgedb.webservicetesting.BridgeDbWebservice;
 import org.bridgedb.bio.Organism;
 import org.bridgedb.rdb.GdbProvider;
 import org.json.simple.JSONObject;
-import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
@@ -18,7 +17,7 @@ public class Contents extends RestletResource {
 			return new StringRepresentation("\n");
 		}
 		try {
-			if (MediaType.APPLICATION_JSON.isCompatible(variant.getMediaType())) {
+			if (RestletResource.jsonRequested(getClientInfo())) {
 		        JSONObject jsonObject = new JSONObject();
 				for (Organism org : getGdbProvider().getOrganisms()) {
 		        	jsonObject.put(org.shortName(), org.latinName());

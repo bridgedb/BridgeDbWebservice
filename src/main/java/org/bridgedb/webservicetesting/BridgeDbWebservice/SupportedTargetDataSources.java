@@ -25,7 +25,7 @@ public class SupportedTargetDataSources extends RestletResource {
     	}
 		try {
 			IDMapper mapper = getIDMappers();
-			if (MediaType.APPLICATION_JSON.isCompatible(variant.getMediaType())) {
+			if (RestletResource.jsonRequested(getClientInfo())) {
 				JSONObject jsonObject = new JSONObject();
 				List<String> resultSet = new ArrayList<>();
 				for (DataSource ds : mapper.getCapabilities().getSupportedTgtDataSources()) {
