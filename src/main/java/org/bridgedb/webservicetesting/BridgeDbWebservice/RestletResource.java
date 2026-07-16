@@ -9,6 +9,9 @@ import org.bridgedb.DataSource;
 import org.bridgedb.IDMapperStack;
 import org.bridgedb.bio.Organism;
 import org.bridgedb.rdb.GdbProvider;
+import org.restlet.data.ClientInfo;
+import org.restlet.data.MediaType;
+import org.restlet.data.Preference;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 
@@ -115,5 +118,34 @@ public class RestletResource extends ServerResource {
 		private GdbProvider getGdbProvider() {
 			return ((RestletService)getApplication()).getGdbProvider();
 		}
-	 
+
+	/**
+	 * Returns whether the client explicitly requested a JSON response.
+	 *
+	 * <p>Only an explicit {@code Accept: application/json} yields JSON; every
+	 * other case (a wildcard {@code Accept: *​/*}, {@code text/plain}, or no
+	 * Accept header at all) falls back to the plain-text (TSV) default.
+	 *
+	 * <p>The resources previously decided this by testing
+	 * {@code APPLICATION_JSON.isCompatible(variant.getMediaType())} against the
+	 * content-negotiated variant. That test also matches wildcard media types,
+	 * and the media type of the negotiated {@code variant} depends on the
+	 * Restlet version's content negotiation. As a result the default response
+	 * format silently flipped from TSV to JSON after the Restlet 2.4.3 -&gt;
+	 * 2.4.4 upgrade, without any change to this code. Reading the client's
+	 * Accept header directly and matching {@code application/json} exactly keeps
+	 * the default stable.
+	 */
+	public static boolean jsonRequested(ClientInfo clientInfo) {
+		if (clientInfo == null) {
+			return false;
+		}
+		for (Preference<MediaType> accepted : clientInfo.getAcceptedMediaTypes()) {
+			if (MediaType.APPLICATION_JSON.equals(accepted.getMetadata())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 }

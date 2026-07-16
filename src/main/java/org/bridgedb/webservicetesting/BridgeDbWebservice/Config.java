@@ -4,7 +4,6 @@ import java.util.Properties;
 
 import org.bridgedb.BridgeDb;
 import org.json.simple.JSONObject;
-import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
@@ -21,7 +20,7 @@ public class Config extends ServerResource {
 			props.load(BridgeDb.class.getClassLoader().getResourceAsStream("version.props"));
 			props.load(RestletServer.class.getClassLoader().getResourceAsStream("webservice.props"));
 
-			if (MediaType.APPLICATION_JSON.isCompatible(variant.getMediaType())) {
+			if (RestletResource.jsonRequested(getClientInfo())) {
 		        JSONObject jsonObject = new JSONObject();
 		        jsonObject.put("java.version", System.getProperty("java.version"));
 		        jsonObject.put("bridgedb.version", props.getProperty("bridgedb.version"));

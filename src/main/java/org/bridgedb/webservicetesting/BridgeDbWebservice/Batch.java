@@ -69,7 +69,7 @@ public class Batch extends RestletResource {
 			String[] splitXrefs = postBody.split("\n");
 			IDMapper mapper = getIDMappers();
 			
-			if (MediaType.APPLICATION_JSON.isCompatible(variant.getMediaType())) {
+			if (RestletResource.jsonRequested(getClientInfo())) {
 				JSONObject jsonObject = new JSONObject();
 				for (String line : splitXrefs) {
 					JSONObject mappedXrefsJson = new JSONObject();
@@ -155,7 +155,7 @@ public class Batch extends RestletResource {
 			String[] splitXrefs = entity.getText().split("\n");
 			IDMapper mapper = getIDMappers();
 
-			if (MediaType.APPLICATION_JSON.isCompatible(variant.getMediaType())) {
+			if (RestletResource.jsonRequested(getClientInfo())) {
 				JSONObject jsonObject = new JSONObject();
 				List<String> resultSet = new ArrayList<>();
 				for (String id : splitXrefs) {

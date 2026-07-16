@@ -70,7 +70,7 @@ public class Xrefs extends RestletResource{
 				xrefs = mapper.mapID(xref);
 			else
 				xrefs = mapper.mapID(xref, targetDs);
-			if(MediaType.APPLICATION_JSON.isCompatible(variant.getMediaType())){
+			if(RestletResource.jsonRequested(getClientInfo())){
 		        JSONObject jsonObject = new JSONObject();
 				for(Xref x : xrefs) {
 					if (targetSystemCode == null ||

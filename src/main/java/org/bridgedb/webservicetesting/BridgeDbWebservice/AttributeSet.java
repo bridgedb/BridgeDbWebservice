@@ -26,7 +26,7 @@ public class AttributeSet extends RestletResource {
 		try {
 			IDMapperStack stack = getIDMappers();
 			Set<String> attributes = stack.getAttributeSet();
-			if (MediaType.APPLICATION_JSON.isCompatible(variant.getMediaType())) {
+			if (RestletResource.jsonRequested(getClientInfo())) {
 				JSONObject jsonObject = new JSONObject();
 				List<String> resultSet = new ArrayList<>();
 				for (String a : attributes) {

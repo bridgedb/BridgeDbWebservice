@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 
 import org.bridgedb.bio.DataSourceTxt;
 import org.json.simple.JSONObject;
-import org.restlet.data.MediaType;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.representation.Variant;
@@ -18,7 +17,7 @@ public class DataSources extends ServerResource{
 
 	@Get
 	public Representation get(Variant variant) {
-		if(MediaType.APPLICATION_JSON.isCompatible(variant.getMediaType())){
+		if(RestletResource.jsonRequested(getClientInfo())){
 			String datasourcesTxt = "";
 			String datasourcesHeaders = "";
 			InputStream headers = DataSourceTxt.class.getClassLoader().getResourceAsStream("org/bridgedb/bio/datasources_headers.tsv");	

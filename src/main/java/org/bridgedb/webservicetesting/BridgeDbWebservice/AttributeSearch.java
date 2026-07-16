@@ -47,7 +47,7 @@ public class AttributeSearch extends RestletResource {
 			if (attribute == null) attribute = "Symbol"; // use symbol by default.
 			Map<Xref, String> results = stack.freeAttributeSearch(searchStr, attribute, limit);
 
-			if (MediaType.APPLICATION_JSON.isCompatible(variant.getMediaType())) {
+			if (RestletResource.jsonRequested(getClientInfo())) {
 				JSONObject jsonObject = new JSONObject();
 				JSONObject attributeSearchResult = new JSONObject();
 				for (Xref x : results.keySet()) {

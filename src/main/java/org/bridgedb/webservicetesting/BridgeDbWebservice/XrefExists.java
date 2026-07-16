@@ -41,7 +41,7 @@ public class XrefExists extends RestletResource {
     	}
 		try {
 			IDMapper mapper = getIDMappers();
-			if (MediaType.APPLICATION_JSON.isCompatible(variant.getMediaType())) {
+			if (RestletResource.jsonRequested(getClientInfo())) {
 				JSONObject jsonObject = new JSONObject();
 				jsonObject.put("exists",mapper.xrefExists(xref));
 				return new StringRepresentation(jsonObject.toString());

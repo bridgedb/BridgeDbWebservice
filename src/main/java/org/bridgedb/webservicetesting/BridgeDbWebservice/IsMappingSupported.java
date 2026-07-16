@@ -46,7 +46,7 @@ public class IsMappingSupported extends RestletResource {
 		try {
 			IDMapper m = getIDMappers();
 			boolean supported = m.getCapabilities().isMappingSupported(srcDs, destDs);
-			if (MediaType.APPLICATION_JSON.isCompatible(variant.getMediaType())) {
+			if (RestletResource.jsonRequested(getClientInfo())) {
 		        JSONObject jsonObject = new JSONObject();
 		        jsonObject.put("supported: ", "" + supported);
 				return new StringRepresentation(jsonObject.toString());

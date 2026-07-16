@@ -21,7 +21,7 @@ public class Properties extends RestletResource{
 			return sr;
     	}
     	
-		if(MediaType.APPLICATION_JSON.isCompatible(variant.getMediaType())){
+		if(RestletResource.jsonRequested(getClientInfo())){
 			try
 			{
 		        JSONObject jsonObject = new JSONObject();
