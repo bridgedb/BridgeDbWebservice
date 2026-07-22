@@ -170,25 +170,37 @@
         </executions>
       </plugin>
       <plugin>
+        <!--
+          Shade (not assembly) builds the fat jar so that META-INF/services/*
+          service descriptors are MERGED across dependencies. The old
+          assembly:jar-with-dependencies clobbered them: the MySQL connector's
+          META-INF/services/java.sql.Driver overwrote Derby's, so the Derby
+          EmbeddedDriver never auto-registered and no .bridge (embedded Derby)
+          database could be opened (every request returned HTTP 500).
+          ServicesResourceTransformer concatenates the descriptors so both the
+          Derby and MySQL drivers stay registered. shadedClassifierName keeps
+          the released artifact name "<artifactId>-<version>-jar-with-dependencies.jar".
+        -->
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>3.7.1</version>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.6.0</version>
         <executions>
           <execution>
             <phase>package</phase>
             <goals>
-              <goal>single</goal>
+              <goal>shade</goal>
             </goals>
             <configuration>
-              <archive>
-                <manifest>
+              <shadedArtifactAttached>true</shadedArtifactAttached>
+              <shadedClassifierName>jar-with-dependencies</shadedClassifierName>
+              <createDependencyReducedPom>false</createDependencyReducedPom>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                   <mainClass>org.bridgedb.webservicetesting.BridgeDbWebservice.RestletServer</mainClass>
-                </manifest>
-                </archive>
-                <descriptorRefs>
-                  <descriptorRef>jar-with-dependencies</descriptorRef>
-                </descriptorRefs>
-              </configuration>
+                </transformer>
+              </transformers>
+            </configuration>
           </execution>
         </executions>
       </plugin>
