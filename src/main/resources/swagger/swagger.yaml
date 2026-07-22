@@ -1,31 +1,277 @@
 openapi: 3.0.3
 info:
-  version: %%BRIDGEDB-WEBSERVICE-VERSION%%
+  version: '%%BRIDGEDB-WEBSERVICE-VERSION%%'
   title: BridgeDb Webservices
   description: |-
-    These are the [BridgeDb Webservices](https://github.com/bridgedb/BridgeDbWebservice) for identifier to identifier mapping.
+    The [BridgeDb Webservices](https://github.com/bridgedb/BridgeDbWebservice) translate
+    biological and chemical identifiers from one database into another — for example an
+    Ensembl gene ID into an HGNC symbol, or an HMDB metabolite into a ChEBI ID.
+
+    > **Response format is TAB-delimited plain text by default, not JSON.** Add the header
+    > `Accept: application/json` to any endpoint below to receive JSON instead. Do not
+    > `JSON.parse` the default response — split on `\n` for lines and `\t` for fields.
+
+    ## Mental model: xrefs, data sources, system codes, organisms
+
+    BridgeDb answers one question: *"Given this identifier from this database, in this
+    organism, what are the equivalent identifiers in other databases?"*
+
+    - **Xref (cross-reference)** — an identifier **plus the data source it belongs to**.
+      `ENSG00000139618` alone is ambiguous; the xref is the pair `(ENSG00000139618, Ensembl)`.
+      Every call therefore carries both an identifier and a system code.
+    - **Data source** — a database/namespace that issues identifiers (Ensembl, HGNC, UniProt,
+      HMDB, ChEBI, Wikidata, …).
+    - **System code** — a short, **case-sensitive** letter code (1–3 chars) naming a data source
+      compactly in URLs and responses. `En` = Ensembl, `H` = HGNC, `S` = UniProt, `Ch` = HMDB,
+      `Ce` = ChEBI, `Wd` = Wikidata. **Pass the code, never the display name** — `Ensembl` where
+      `En` is expected fails, and `EN`/`en` are not `En`.
+    - **Organism** — mappings are partitioned per organism (each has its own mapping database).
+      Name the organism in every mapping call, either as the **Latin binomial** (`Homo sapiens`)
+      or a **common short name** (`Human`); the organism code (`Hs`) also resolves. Metabolite /
+      chemistry mappings are typically served under `Human`.
+
+    A mapping request always resolves to: **organism + source system code + source identifier →
+    identifiers in one or all target system codes.**
+
+    ## Choosing organism and system codes
+
+    Use the exact organism spelling (case and spacing matter); URL-encode spaces as `%20` with
+    strict clients. Rough system-code picks:
+
+    - **Genes** — Ensembl `En`, NCBI/Entrez Gene `L`, HGNC symbol `H`, RefSeq `Q`, UniGene `U`,
+      UCSC `Uc`, OMIM `Om`.
+    - **Proteins** — UniProt `S`, PDB `Pd`.
+    - **Metabolites / chemicals** — HMDB `Ch`, ChEBI `Ce`, KEGG Compound `Ck`, ChemSpider `Cs`,
+      PubChem-compound `Cpc`, CAS `Ca`, InChIKey `Ik`, LIPID MAPS `Lm`, Wikidata `Wd`.
+
+    If unsure whether a source→target mapping exists for an organism, **check first** with
+    `GET /{organism}/isMappingSupported/{src}/{dest}` rather than issuing a call that returns empty
+    — this separates "unsupported" from "supported but no hit".
+
+    ## Reading TAB-delimited responses
+
+    - **Single-xref calls** (`/xrefs/...`) return one xref per line as `identifier\tsystemCode`.
+      Split each non-empty line on the first tab; field 1 is the target identifier, field 2 the
+      target system code. The source xref is usually echoed back.
+    - **Batch calls** (`/xrefsBatch...`) return one **input** per line as
+      `queryId\tquerySystemCode\tid1,code1,id2,code2,...` — the result block is **comma-delimited**
+      (alternating id/code pairs), not tab-delimited. An empty third field means no mapping found.
+    - **Boolean calls** (`isMappingSupported`, `isFreeSearchSupported`, `xrefExists`) return the
+      literal text `true` or `false` (JSON form: a small object such as `{"exists":true}`).
+    - **Empty result ≠ error.** A `200` with no lines means no cross-references were found.
+
+    ## Batch body format
+
+    Batch endpoints are **POST** with a `text/plain` body, one entry per line:
+
+    - `POST /{organism}/xrefsBatch` and `.../xrefsBatch/targetDs` — every line carries its own
+      source code: `identifier<TAB>systemCode`.
+    - `POST /{organism}/xrefsBatch/{systemCode}` and `.../{systemCode}/targetDs` — the source code
+      is fixed by the path, so lines are **bare identifiers**, one per line.
+
+    Restrict a batch to one target database with the `?targetDs=CODE` query parameter (for single
+    GET mapping the target is a path segment instead: `.../xrefs/{code}/{id}/{targetCode}`).
+
+    ## System-code quick reference
+
+    | Code | Data source | Category | | Code | Data source | Category |
+    |------|-------------|----------|-|------|-------------|----------|
+    | `En` | Ensembl | Gene | | `Ce` | ChEBI | Metabolite |
+    | `L` | NCBI/Entrez Gene | Gene | | `Ch` | HMDB | Metabolite |
+    | `H` | HGNC (symbol) | Gene | | `Ck` | KEGG Compound | Metabolite |
+    | `Q` | RefSeq | Gene/RNA/Protein | | `Cs` | ChemSpider | Metabolite |
+    | `U` | UniGene | Gene | | `Cpc` | PubChem-compound | Metabolite |
+    | `Uc` | UCSC | Gene | | `Ca` | CAS | Metabolite |
+    | `Om` | OMIM | Gene/disease | | `Ik` | InChIKey | Metabolite |
+    | `S` | UniProt (TrEMBL) | Protein | | `Lm` | LIPID MAPS | Metabolite/lipid |
+    | `Pd` | PDB | Protein structure | | `Cks` | KNApSAcK | Metabolite |
+    | `E` | EC number | Enzyme | | `Wd` | Wikidata | General |
+    | `T` | Gene Ontology | Ontology | | `Wi` | Wikipedia | General |
+    | `X` | Affymetrix probeset | Probe | | `Re` | Reactome | Pathway |
+    | `Il` | Illumina | Probe | | `Rh` | Rhea | Reaction |
+
+    The authoritative, always-current list is at
+    <https://www.bridgedb.org/pages/system-codes.html> and
+    <https://github.com/bridgedb/datasources>.
+
+    ## Worked examples
+
+    **1. Human Ensembl gene → all mappings**
+    ```
+    GET /Human/xrefs/En/ENSG00000139618          # BRCA2, all target databases
+    ```
+    Response (abbreviated), one `identifier\tsystemCode` per line:
+    ```
+    BRCA2	H
+    P51587	S
+    NM_000059	Q
+    600185	Om
+    ```
+
+    **2. Same gene, only HGNC symbol**
+    ```
+    GET /Human/xrefs/En/ENSG00000139618/H        # -> BRCA2	H
+    ```
+
+    **3. Batch many genes → UniProt only**
+    ```
+    POST /Human/xrefsBatch/En?targetDs=S
+    Content-Type: text/plain
+
+    ENSG00000139618
+    ENSG00000141510
+    ENSG00000012048
+    ```
+    Response — one line per input, third field comma-joined `id,code` pairs:
+    ```
+    ENSG00000139618	En	P51587,S
+    ENSG00000141510	En	P04637,S
+    ENSG00000012048	En	P38398,S
+    ```
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
 servers:
-  - url: %%BRIDGEDB-SERVER-URL%%
+  - url: '%%BRIDGEDB-SERVER-URL%%'
 tags:
   - name: mappings
-    description: Identifier mapping services for gene products (e.g. genes, RNA, proteins), metabolites, nutrients, hormones, vitamins, drugs, peptides, and chemical compounds from the exposome
+    description: Identifier mapping services for gene products (genes, RNA, proteins), metabolites, nutrients, hormones, vitamins, drugs, peptides, and chemical compounds from the exposome
   - name: organism
-    description: Services to find details for the organism identifier mappings
+    description: Services to inspect capabilities and supported data sources of an organism's identifier mappings
   - name: search
-    description: Services to find identifiers
+    description: Free-text search for identifiers
   - name: attributes
-    description: Services to get and search attributes
+    description: Services to get and search attributes (e.g. gene symbols, descriptions)
+  - name: discovery
+    description: Deployment-wide, non-organism-scoped services (loaded organisms, data-source registry, runtime versions)
 paths:
+  /datasources:
+    get:
+      tags:
+        - discovery
+      summary: List the full BridgeDb data-source registry
+      description: |-
+        Returns the complete BridgeDb data-source registry bundled with the service
+        (from `datasources.tsv`). Not organism-scoped. Use it to look up a data source's
+        system code, canonical name, and identifier pattern.
+      responses:
+        "200":
+          description: |-
+            `text/plain`: the raw datasources TSV dump. `application/json`: an object keyed by
+            data-source system code, each value an object of column-header → field value.
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: |-
+                Ensembl	En	ENSG00000139618	http://identifiers.org/ensembl/	gene
+                HGNC	H	BRCA2		gene
+                UniProt-TrEMBL	S	P51587	http://identifiers.org/uniprot/	protein
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+              example:
+                En:
+                  name: Ensembl
+                  systemCode: En
+                  type: gene
+                H:
+                  name: HGNC
+                  systemCode: H
+                  type: gene
+  /config:
+    get:
+      tags:
+        - discovery
+      summary: Report runtime versions
+      description: |-
+        Returns runtime version information for the deployment (Java, BridgeDb library, and
+        webservice versions). Not organism-scoped.
+      responses:
+        "200":
+          description: |-
+            `text/plain`: one `key\tvalue` line per version. `application/json`: a flat object.
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: |-
+                java.version	17.0.10
+                bridgedb.version	3.0.27
+                webservice.version	2.1.8
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+              example:
+                java.version: "17.0.10"
+                bridgedb.version: "3.0.27"
+                webservice.version: "2.1.8"
+  /contents:
+    get:
+      tags:
+        - discovery
+      summary: List the organisms loaded in this deployment
+      description: |-
+        Lists the organisms actually loaded and available in this deployment. Use it to confirm
+        an organism is present before issuing mapping calls. This is the only discovery call with
+        no `{organism}` segment. An empty deployment returns a single newline.
+      responses:
+        "200":
+          description: |-
+            `text/plain`: one `shortName\tlatinName` line per organism. `application/json`:
+            an object mapping short name to Latin name.
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: |-
+                Human	Homo sapiens
+                Mouse	Mus musculus
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+              example:
+                Human: Homo sapiens
+                Mouse: Mus musculus
+  /{organism}:
+    get:
+      tags:
+        - discovery
+      summary: Root / catch-all help page
+      description: |-
+        Catch-all route for single-segment paths that did not match a more specific endpoint. It
+        does **not** validate or use the organism value; it always returns a fixed
+        "Unrecognized query" HTML help page. `/{organism}` alone is not a data endpoint — use
+        `/{organism}/xrefs/...` and the other routes below.
+      parameters:
+        - name: organism
+          in: path
+          required: true
+          description: Ignored. Any single path segment lands here.
+          schema:
+            type: string
+          example: Human
+      responses:
+        "200":
+          description: A static HTML "Unrecognized query" help page.
+          content:
+            text/html:
+              schema:
+                type: string
   /{organism}/xrefs/{systemCode}/{identifier}:
     get:
       tags:
         - mappings
-      summary: Returns a list of xrefs
-      description: Returns a list of xrefs that map to a given identifier, data source,
-        and organism.
+      summary: Map an identifier to all equivalent xrefs
+      description: |-
+        Maps one source xref (organism + system code + identifier) to **all** equivalent
+        identifiers across every available target data source.
       parameters:
         - name: organism
           in: path
@@ -33,34 +279,233 @@ paths:
           description: Organism (Latin name or short name).
           schema:
             $ref: '#/components/schemas/Organism'
+          example: Human
         - name: systemCode
           in: path
           required: true
-          description: system code for the source database
+          description: System code of the source data source.
           schema:
             $ref: '#/components/schemas/SystemCode'
+          example: En
         - name: identifier
           in: path
           required: true
-          description: source identifier
+          description: Source identifier, exactly as issued by the source database.
           schema:
             type: string
+          example: ENSG00000139618
+        - name: dataSource
+          in: query
+          required: false
+          description: Optional target system code — keeps only results in this data source (client-side filter).
+          schema:
+            $ref: '#/components/schemas/SystemCode'
+          example: H
       responses:
-        200:
-          description: Returns a tab-delimited list of xrefs that map to a given identifier
-          content:            
-           text/plain:
+        "200":
+          description: |-
+            Equivalent xrefs. `text/plain`: one `identifier\tsystemCode` per line.
+            `application/json`: an object mapping the Bioregistry compact identifier to its data-source name.
+          content:
+            text/plain:
               schema:
                 type: string
-           application/json:
+              example: |-
+                BRCA2	H
+                P51587	S
+                NM_000059	Q
+                600185	Om
+                ENSG00000139618	En
+            application/json:
               schema:
                 type: object
+                additionalProperties:
+                  type: string
+              example:
+                ensembl:ENSG00000139618: Ensembl
+                hgnc.symbol:BRCA2: HGNC
+                uniprot:P51587: UniProt-TrEMBL
+  /{organism}/xrefs/{systemCode}/{identifier}/{targetSystemCode}:
+    get:
+      tags:
+        - mappings
+      summary: Map an identifier to xrefs in one target data source
+      description: |-
+        Maps one source xref to equivalent identifiers **only** in the specified target data
+        source. The target-filter form of `/{organism}/xrefs/{systemCode}/{identifier}`.
+      parameters:
+        - name: organism
+          in: path
+          required: true
+          description: Organism (Latin name or short name).
+          schema:
+            $ref: '#/components/schemas/Organism'
+          example: Human
+        - name: systemCode
+          in: path
+          required: true
+          description: System code of the source data source.
+          schema:
+            $ref: '#/components/schemas/SystemCode'
+          example: En
+        - name: identifier
+          in: path
+          required: true
+          description: Source identifier.
+          schema:
+            type: string
+          example: ENSG00000139618
+        - name: targetSystemCode
+          in: path
+          required: true
+          description: System code of the single target data source to return.
+          schema:
+            $ref: '#/components/schemas/SystemCode'
+          example: S
+      responses:
+        "200":
+          description: |-
+            Equivalent xrefs in the target data source. `text/plain`: one `identifier\tsystemCode`
+            per line. `application/json`: compact-identifier → data-source name.
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: |-
+                P51587	S
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+              example:
+                uniprot:P51587: UniProt-TrEMBL
+  /{organism}/xrefs/{prefix}:{id}:
+    get:
+      tags:
+        - mappings
+      summary: Map a compact (Bioregistry) identifier to all equivalent xrefs
+      description: |-
+        Maps a Bioregistry / compact identifier of the form `prefix:id` (e.g. `ensembl:ENSG00000139618`)
+        to all equivalent xrefs. The data source is resolved from the compact-identifier `prefix`.
+        Prefer the explicit system-code route (`/{organism}/xrefs/{systemCode}/{identifier}`) for
+        predictability; use this form when you already hold a compact identifier. `prefix` and
+        `id` are packed into a single path segment separated by a literal colon.
+      parameters:
+        - name: organism
+          in: path
+          required: true
+          description: Organism (Latin name or short name).
+          schema:
+            $ref: '#/components/schemas/Organism'
+          example: Human
+        - name: prefix
+          in: path
+          required: true
+          description: Bioregistry / compact-identifier prefix of the source data source.
+          schema:
+            type: string
+          example: ensembl
+        - name: id
+          in: path
+          required: true
+          description: Source identifier (the part after the colon).
+          schema:
+            type: string
+          example: ENSG00000139618
+        - name: dataSource
+          in: query
+          required: false
+          description: Optional target system code — keeps only results in this data source.
+          schema:
+            $ref: '#/components/schemas/SystemCode'
+          example: H
+      responses:
+        "200":
+          description: |-
+            Equivalent xrefs. `application/json`: compact-identifier → data-source name.
+            `text/plain`: one `identifier\tsystemCode` per line. `text/html`: an HTML page linking
+            each result to `https://bioregistry.org/<compactId>`.
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: |-
+                BRCA2	H
+                P51587	S
+                ENSG00000139618	En
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+              example:
+                ensembl:ENSG00000139618: Ensembl
+                hgnc.symbol:BRCA2: HGNC
+                uniprot:P51587: UniProt-TrEMBL
+            text/html:
+              schema:
+                type: string
+  /{organism}/xrefExists/{systemCode}/{identifier}:
+    get:
+      tags:
+        - mappings
+      summary: Check whether an xref exists
+      description: |-
+        Returns whether the given xref exists in any mapper for the organism, without returning
+        its mappings. Useful to distinguish "identifier not present" from "present but no mapping
+        to the requested target".
+      parameters:
+        - name: organism
+          in: path
+          required: true
+          description: Organism (Latin name or short name).
+          schema:
+            $ref: '#/components/schemas/Organism'
+          example: Human
+        - name: systemCode
+          in: path
+          required: true
+          description: System code of the source data source.
+          schema:
+            $ref: '#/components/schemas/SystemCode'
+          example: En
+        - name: identifier
+          in: path
+          required: true
+          description: Source identifier.
+          schema:
+            type: string
+          example: ENSG00000139618
+      responses:
+        "200":
+          description: |-
+            `text/plain`: the literal `true` or `false`. `application/json`: `{"exists":true}`.
+          content:
+            text/plain:
+              schema:
+                type: string
+                enum:
+                  - "true"
+                  - "false"
+              example: "true"
+            application/json:
+              schema:
+                type: object
+                properties:
+                  exists:
+                    type: boolean
+              example:
+                exists: true
   /{organism}/xrefsBatch:
     post:
       tags:
         - mappings
-      description: Returns a list of xrefs, that maps to a given list of identifiers
-        to a given data source and organism.
+      summary: Batch-map many xrefs (per-line source code)
+      description: |-
+        Batch-maps many xrefs to **all** target data sources in one request. The body is
+        `text/plain` with one entry per line, each line `identifier<TAB>systemCode` (the source
+        data source is given per line, not in the path).
       parameters:
         - name: organism
           in: path
@@ -68,27 +513,97 @@ paths:
           description: Organism (Latin name or short name).
           schema:
             $ref: '#/components/schemas/Organism'
+          example: Human
       requestBody:
+        required: true
         content:
           text/plain:
             schema:
               $ref: '#/components/schemas/XrefBatchInput'
       responses:
-        200:
-          description: Returns a tab-delimited list of xrefs that map to a given identifier
-          content:            
-           text/plain:
+        "200":
+          description: |-
+            One line per input. `text/plain`: `queryId\tsourceFullName\tid1,code1,id2,code2,...`
+            (or `...\tN/A` when nothing maps). `application/json`: an object keyed by input id.
+          content:
+            text/plain:
               schema:
                 type: string
-           application/json:
+              example: |-
+                ENSG00000139618	Ensembl	BRCA2,H,P51587,S,600185,Om
+                ENSMUSG00000032462	Ensembl	N/A
+            application/json:
               schema:
                 type: object
+                additionalProperties:
+                  type: object
+              example:
+                ENSG00000139618:
+                  result set:
+                    - hgnc.symbol:BRCA2
+                    - uniprot:P51587
+                  datasource: Ensembl
+  /{organism}/xrefsBatch/targetDs:
+    post:
+      tags:
+        - mappings
+      summary: Batch-map many xrefs to one target data source (per-line source code)
+      description: |-
+        Same as `POST /{organism}/xrefsBatch`, but restricts every result to the single target
+        data source given in the `targetDs` **query parameter**. The trailing path segment
+        `targetDs` is a literal string, not a variable — the actual target is the query parameter.
+      parameters:
+        - name: organism
+          in: path
+          required: true
+          description: Organism (Latin name or short name).
+          schema:
+            $ref: '#/components/schemas/Organism'
+          example: Human
+        - name: targetDs
+          in: query
+          required: true
+          description: System code (or full name) of the target data source to restrict results to.
+          schema:
+            $ref: '#/components/schemas/SystemCode'
+          example: S
+      requestBody:
+        required: true
+        content:
+          text/plain:
+            schema:
+              $ref: '#/components/schemas/XrefBatchInput'
+      responses:
+        "200":
+          description: |-
+            One line per input, restricted to the target data source. Same shape as
+            `POST /{organism}/xrefsBatch`.
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: |-
+                ENSG00000139618	Ensembl	P51587,S
+                ENSG00000141510	Ensembl	P04637,S
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+              example:
+                ENSG00000139618:
+                  result set:
+                    - uniprot:P51587
+                  datasource: Ensembl
   /{organism}/xrefsBatch/{systemCode}:
     post:
       tags:
         - mappings
-      description: Returns a list of xrefs, that maps to a given list of identifiers
-        to a given data source and organism.
+      summary: Batch-map many identifiers from one source data source
+      description: |-
+        Batch-maps a list where every identifier belongs to the same source data source (fixed by
+        the `{systemCode}` path segment). The body is `text/plain` with **one bare identifier per
+        line** (no per-line system code). Maps to all target data sources.
       parameters:
         - name: organism
           in: path
@@ -96,33 +611,52 @@ paths:
           description: Organism (Latin name or short name).
           schema:
             $ref: '#/components/schemas/Organism'
+          example: Human
         - name: systemCode
           in: path
           required: true
-          description: system code for the source database
+          description: System code shared by every identifier in the body.
           schema:
             $ref: '#/components/schemas/SystemCode'
+          example: En
       requestBody:
+        required: true
         content:
           text/plain:
             schema:
-              $ref: '#/components/schemas/XrefBatchInput'
+              $ref: '#/components/schemas/XrefBatchIdList'
       responses:
-        200:
-          description: Returns a tab-delimited list of xrefs that map to a given identifier
-          content:            
-           text/plain:
+        "200":
+          description: |-
+            One line per input. Same shape as `POST /{organism}/xrefsBatch`
+            (`queryId\tsourceFullName\tid,code,...`).
+          content:
+            text/plain:
               schema:
                 type: string
-           application/json:
+              example: |-
+                ENSG00000139618	Ensembl	BRCA2,H,P51587,S
+                ENSG00000141510	Ensembl	TP53,H,P04637,S
+            application/json:
               schema:
                 type: object
-  /{organism}/xrefExists/{systemCode}/{identifier}:
-    get:
+                additionalProperties:
+                  type: object
+              example:
+                ENSG00000139618:
+                  result set:
+                    - hgnc.symbol:BRCA2
+                    - uniprot:P51587
+                  datasource: Ensembl
+  /{organism}/xrefsBatch/{systemCode}/targetDs:
+    post:
       tags:
-        - search
-      description: Returns a list of xrefs, that maps to a given list of identifiers
-        to a given data source and organism.
+        - mappings
+      summary: Batch-map identifiers from one source to one target data source
+      description: |-
+        Single-source batch (bare-id lines, all in `{systemCode}`) restricted to the single target
+        data source given in the `targetDs` **query parameter**. The trailing path segment
+        `targetDs` is a literal string, not a variable.
       parameters:
         - name: organism
           in: path
@@ -130,33 +664,58 @@ paths:
           description: Organism (Latin name or short name).
           schema:
             $ref: '#/components/schemas/Organism'
+          example: Human
         - name: systemCode
           in: path
           required: true
-          description: system code for the source database
+          description: System code shared by every identifier in the body.
           schema:
             $ref: '#/components/schemas/SystemCode'
-        - name: identifier
-          in: path
+          example: En
+        - name: targetDs
+          in: query
           required: true
-          description: source identifier
+          description: System code (or full name) of the target data source to restrict results to.
           schema:
-            type: string
+            $ref: '#/components/schemas/SystemCode'
+          example: S
+      requestBody:
+        required: true
+        content:
+          text/plain:
+            schema:
+              $ref: '#/components/schemas/XrefBatchIdList'
       responses:
-        200:
-          description: Returns a tab-delimited list of xrefs that map to a given identifier
-          content:            
-           text/plain:
+        "200":
+          description: |-
+            One line per input, restricted to the target data source. Same shape as
+            `POST /{organism}/xrefsBatch`.
+          content:
+            text/plain:
               schema:
                 type: string
-           application/json:
+              example: |-
+                ENSG00000139618	Ensembl	P51587,S
+                ENSG00000141510	Ensembl	P04637,S
+            application/json:
               schema:
                 type: object
+                additionalProperties:
+                  type: object
+              example:
+                ENSG00000139618:
+                  result set:
+                    - uniprot:P51587
+                  datasource: Ensembl
   /{organism}/search/{query}:
     get:
       tags:
         - search
-      description: Returns a list of xrefs with identifiers that contain the query string for a given organism. Results are not restricted to exact matches. Optionally limit results to a specified number per data source.
+      summary: Free-text identifier search
+      description: |-
+        Free-text substring search over identifiers across the organism's mappers (not restricted
+        to exact matches). Returns matching xrefs. Use `/attributeSearch/{query}` to search by
+        attribute value (such as a gene symbol) instead of by identifier.
       parameters:
         - name: organism
           in: path
@@ -164,28 +723,91 @@ paths:
           description: Organism (Latin name or short name).
           schema:
             $ref: '#/components/schemas/Organism'
+          example: Human
         - name: query
           in: path
           required: true
-          example: 1234
-          description: identifier query
+          description: Identifier query string (substring match).
           schema:
             type: string
+          example: ENSG00000139618
       responses:
-        200:
-          description: Returns a tab-delimited list of xrefs that match to a given query
-          content:            
-           text/plain:
+        "200":
+          description: |-
+            Matching xrefs. `text/plain`: one `identifier\tsystemCode` per line (empty result → a
+            single newline). `application/json`: an object mapping identifier → data-source name.
+          content:
+            text/plain:
               schema:
                 type: string
-           application/json:
+              example: |-
+                ENSG00000139618	En
+            application/json:
               schema:
                 type: object
+                additionalProperties:
+                  type: string
+              example:
+                ENSG00000139618: Ensembl
+  /{organism}/search/{query}/{limit}:
+    get:
+      tags:
+        - search
+      summary: Free-text identifier search, capped
+      description: |-
+        Same free-text identifier search as `/{organism}/search/{query}`, capped at `limit`
+        results.
+      parameters:
+        - name: organism
+          in: path
+          required: true
+          description: Organism (Latin name or short name).
+          schema:
+            $ref: '#/components/schemas/Organism'
+          example: Human
+        - name: query
+          in: path
+          required: true
+          description: Identifier query string (substring match).
+          schema:
+            type: string
+          example: ENSG0000013
+        - name: limit
+          in: path
+          required: true
+          description: Maximum number of results to return.
+          schema:
+            type: integer
+          example: 10
+      responses:
+        "200":
+          description: |-
+            Matching xrefs, at most `limit`. `text/plain`: one `identifier\tsystemCode` per line.
+            `application/json`: identifier → data-source name.
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: |-
+                ENSG00000139618	En
+                ENSG00000130700	En
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+              example:
+                ENSG00000139618: Ensembl
+                ENSG00000130700: Ensembl
   /{organism}/attributeSearch/{query}:
     get:
       tags:
         - attributes
-      description: Returns a list of xrefs and associated attributes that contain the query string for a given organism. Results are not restricted to exact matches. Optionally limit results to a specified number per data source, or by the type of attribute. See possible attribute types via /{organism}/attributeSet.
+      summary: Free-text attribute search
+      description: |-
+        Free-text substring search over attribute values (defaults to the `Symbol` attribute),
+        returning matching xrefs and the matched attribute value. Not restricted to exact matches;
+        no result limit. See possible attribute types via `/{organism}/attributeSet`.
       parameters:
         - name: organism
           in: path
@@ -193,28 +815,44 @@ paths:
           description: Organism (Latin name or short name).
           schema:
             $ref: '#/components/schemas/Organism'
+          example: Human
         - name: query
           in: path
           required: true
-          example: 1234
-          description: identifier query
+          description: Attribute value query string (substring match).
           schema:
             type: string
+          example: BRCA2
       responses:
-        200:
-          description: Returns a tab-delimited list of xrefs that match to a given query
-          content:            
-           text/plain:
+        "200":
+          description: |-
+            Matching xrefs with their matched attribute value. `text/plain`: one
+            `id\tfullName\tattributeValue` per line (empty result → a single newline).
+            `application/json`: `{ id: {"full name: ": fullName, "xref: ": attributeValue} }`.
+          content:
+            text/plain:
               schema:
                 type: string
-           application/json:
+              example: |-
+                ENSG00000139618	Ensembl	BRCA2
+            application/json:
               schema:
                 type: object
-  /{organism}/properties:
+                additionalProperties:
+                  type: object
+              example:
+                ENSG00000139618:
+                  "full name: ": Ensembl
+                  "xref: ": BRCA2
+  /{organism}/attributeSearch/{query}/params:
     get:
       tags:
-        - organism
-      description: Returns the list of properties available for a given organism.
+        - attributes
+      summary: Free-text attribute search with attrName/limit query parameters
+      description: |-
+        Same free-text attribute search as `/{organism}/attributeSearch/{query}`, but the
+        attribute type and result limit are supplied as **query parameters**. The trailing path
+        segment `params` is a literal string, not a variable.
       parameters:
         - name: organism
           in: path
@@ -222,143 +860,58 @@ paths:
           description: Organism (Latin name or short name).
           schema:
             $ref: '#/components/schemas/Organism'
+          example: Human
+        - name: query
+          in: path
+          required: true
+          description: Attribute value query string (substring match).
+          schema:
+            type: string
+          example: BRCA2
+        - name: attrName
+          in: query
+          required: false
+          description: Attribute type to search (default `Symbol`). See `/{organism}/attributeSet`.
+          schema:
+            type: string
+            default: Symbol
+          example: Symbol
+        - name: limit
+          in: query
+          required: false
+          description: Maximum number of results (default 0 = unlimited).
+          schema:
+            type: integer
+            default: 0
+          example: 10
       responses:
-        200:
-          description: Returns a tab-delimited list of xrefs that match to a given query
-          content:            
-           text/plain:
+        "200":
+          description: |-
+            Matching xrefs with their matched attribute value. Same shape as
+            `/{organism}/attributeSearch/{query}`.
+          content:
+            text/plain:
               schema:
                 type: string
-           application/json:
+              example: |-
+                ENSG00000139618	Ensembl	BRCA2
+            application/json:
               schema:
                 type: object
-  /{organism}/sourceDataSources:
-    get:
-      tags:
-        - organism
-      description: Returns a list of data sources available as xref sources for a given organism.
-      parameters:
-        - name: organism
-          in: path
-          required: true
-          description: Organism (Latin name or short name).
-          schema:
-            $ref: '#/components/schemas/Organism'
-      responses:
-        200:
-          description: Returns a tab-delimited list of xrefs that match to a given query
-          content:            
-           text/plain:
-              schema:
-                type: string
-           application/json:
-              schema:
-                type: object
-  /{organism}/targetDataSources:
-    get:
-      tags:
-        - organism
-      description: Returns a list of data sources available as xref sources for a given organism.
-      parameters:
-        - name: organism
-          in: path
-          required: true
-          description: Organism (Latin name or short name).
-          schema:
-            $ref: '#/components/schemas/Organism'
-      responses:
-        200:
-          description: Returns a tab-delimited list of xrefs that match to a given query
-          content:            
-           text/plain:
-              schema:
-                type: string
-           application/json:
-              schema:
-                type: object
-  /{organism}/isFreeSearchSupported:
-    get:
-      tags:
-        - organism
-      description: Returns true or false based on whether or not /{organism}/search/{query} is supported for a given organism.
-      parameters:
-        - name: organism
-          in: path
-          required: true
-          description: Organism (Latin name or short name).
-          schema:
-            $ref: '#/components/schemas/Organism'
-      responses:
-        200:
-          description: Returns a tab-delimited list of xrefs that match to a given query
-          content:            
-           text/plain:
-              schema:
-                type: boolean
-           application/json:
-              schema:
-                type: object
-  /{organism}/isMappingSupported/{sourceSystemCode}/{targetSystemCode}:
-    get:
-      tags:
-        - organism
-      description: Returns true or false based on whether or not /{organism}/search/{query} is supported for a given organism.
-      parameters:
-        - name: organism
-          in: path
-          required: true
-          description: Organism (Latin name or short name).
-          schema:
-            $ref: '#/components/schemas/Organism'
-        - name: sourceSystemCode
-          in: path
-          required: true
-          description: system code for the source database
-          schema:
-            $ref: '#/components/schemas/SystemCode'
-        - name: targetSystemCode
-          in: path
-          required: true
-          description: system code for the source database
-          schema:
-            $ref: '#/components/schemas/SystemCode'
-      responses:
-        200:
-          description: Returns true or false based on whether or not /{organism}/xrefs/{systemCode}/{identifier} would possibly return a {targetSystemCode} result given a {sourceSystemCode} query. This function basically combines the results of /{organism}/sourceDataSources and /{organism}/targetDataSources into a single boolean result.
-          content:            
-           text/plain:
-              schema:
-                type: boolean
-           application/json:
-              schema:
-                type: object
-  /{organism}/attributeSet:
-    get:
-      tags:
-        - organism
-      description: Returns the supported attributes to the given Organism.
-      parameters:
-        - name: organism
-          in: path
-          required: true
-          description: Organism (Latin name or short name).
-          schema:
-            $ref: '#/components/schemas/Organism'
-      responses:
-        200:
-          description: Returns a tab-delimited list of xrefs that match to a given query
-          content:            
-           text/plain:
-              schema:
-                type: boolean
-           application/json:
-              schema:
-                type: object
+                additionalProperties:
+                  type: object
+              example:
+                ENSG00000139618:
+                  "full name: ": Ensembl
+                  "xref: ": BRCA2
   /{organism}/attributes/{systemCode}/{identifier}:
     get:
       tags:
         - attributes
-      description: Returns the attributes for a given identifier, data source, organism. Optionally display only a specified attribute.
+      summary: Get all attributes for an xref
+      description: |-
+        Returns all stored attributes (all types) for one xref — for example the gene symbol,
+        description, chromosome, or type — rather than its cross-references.
       parameters:
         - name: organism
           in: path
@@ -366,35 +919,364 @@ paths:
           description: Organism (Latin name or short name).
           schema:
             $ref: '#/components/schemas/Organism'
+          example: Human
         - name: systemCode
           in: path
           required: true
-          description: system code for the source database
+          description: System code of the data source.
           schema:
             $ref: '#/components/schemas/SystemCode'
+          example: L
         - name: identifier
           in: path
           required: true
-          description: source identifier
+          description: Identifier.
           schema:
             type: string
+          example: "675"
       responses:
-        200:
-          description: Returns a tab-delimited list with the attributes and their content
-          content:            
-           text/plain:
+        "200":
+          description: |-
+            The xref's attributes. `text/plain`: one `attrName\tvalue` per line.
+            `application/json`: a flat object mapping attribute name → value.
+          content:
+            text/plain:
               schema:
-                type: boolean
-           application/json:
+                type: string
+              example: |-
+                Symbol	BRCA2
+                Type	protein-coding
+                Chromosome	13
+                Description	BRCA2 DNA repair associated
+            application/json:
               schema:
                 type: object
-
+                additionalProperties:
+                  type: string
+              example:
+                Symbol: BRCA2
+                Type: protein-coding
+                Chromosome: "13"
+                Description: BRCA2 DNA repair associated
+  /{organism}/attributes/{systemCode}/{identifier}/attrName:
+    get:
+      tags:
+        - attributes
+      summary: Get one attribute type for an xref
+      description: |-
+        Returns only the values of a single attribute type for an xref. The trailing path segment
+        `attrName` is a literal string, not a variable — the attribute type itself is supplied via
+        the `attrName` **query parameter**. If `attrName` is omitted, the resource falls back to
+        all-attributes behaviour.
+      parameters:
+        - name: organism
+          in: path
+          required: true
+          description: Organism (Latin name or short name).
+          schema:
+            $ref: '#/components/schemas/Organism'
+          example: Human
+        - name: systemCode
+          in: path
+          required: true
+          description: System code of the data source.
+          schema:
+            $ref: '#/components/schemas/SystemCode'
+          example: L
+        - name: identifier
+          in: path
+          required: true
+          description: Identifier.
+          schema:
+            type: string
+          example: "675"
+        - name: attrName
+          in: query
+          required: false
+          description: Attribute type to return (e.g. `Symbol`). See `/{organism}/attributeSet`.
+          schema:
+            type: string
+          example: Symbol
+      responses:
+        "200":
+          description: |-
+            The requested attribute's values. `text/plain`: one value per line.
+            `application/json`: `{attrName: value}`.
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: |-
+                BRCA2
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+              example:
+                Symbol: BRCA2
+  /{organism}/attributeSet:
+    get:
+      tags:
+        - organism
+      summary: List available attribute names
+      description: |-
+        Lists the set of attribute names available across the organism's mapper stack (e.g.
+        `Symbol`, `Chromosome`, `Type`, `Description`). Use these names to drive
+        `/{organism}/attributeSearch` and `/{organism}/attributes`.
+      parameters:
+        - name: organism
+          in: path
+          required: true
+          description: Organism (Latin name or short name).
+          schema:
+            $ref: '#/components/schemas/Organism'
+          example: Human
+      responses:
+        "200":
+          description: |-
+            Available attribute names. `text/plain`: one name per line.
+            `application/json`: `{"attributes":[...]}`.
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: |-
+                Symbol
+                Chromosome
+                Type
+                Description
+            application/json:
+              schema:
+                type: object
+                properties:
+                  attributes:
+                    type: array
+                    items:
+                      type: string
+              example:
+                attributes:
+                  - Symbol
+                  - Chromosome
+                  - Type
+                  - Description
+  /{organism}/properties:
+    get:
+      tags:
+        - organism
+      summary: Dump organism mapper properties
+      description: |-
+        Dumps the capability property keys/values of every IDMapper in the organism's mapper
+        stack.
+      parameters:
+        - name: organism
+          in: path
+          required: true
+          description: Organism (Latin name or short name).
+          schema:
+            $ref: '#/components/schemas/Organism'
+          example: Human
+      responses:
+        "200":
+          description: |-
+            Mapper properties. `text/plain`: one `key\tvalue` per line.
+            `application/json`: a flat object.
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: |-
+                DATASOURCENAME	Homo sapiens
+                SCHEMAVERSION	3
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+              example:
+                DATASOURCENAME: Homo sapiens
+                SCHEMAVERSION: "3"
+  /{organism}/sourceDataSources:
+    get:
+      tags:
+        - organism
+      summary: List data sources usable as mapping sources
+      description: |-
+        Lists the data sources usable as a mapping **source** for the organism — i.e. which system
+        codes are valid inputs.
+      parameters:
+        - name: organism
+          in: path
+          required: true
+          description: Organism (Latin name or short name).
+          schema:
+            $ref: '#/components/schemas/Organism'
+          example: Human
+      responses:
+        "200":
+          description: |-
+            Source data sources. `text/plain`: one full name per line.
+            `application/json`: `{"supportedSourceDatasources":[...]}`.
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: |-
+                Ensembl
+                Entrez Gene
+                HGNC
+                UniProt-TrEMBL
+            application/json:
+              schema:
+                type: object
+                properties:
+                  supportedSourceDatasources:
+                    type: array
+                    items:
+                      type: string
+              example:
+                supportedSourceDatasources:
+                  - Ensembl
+                  - Entrez Gene
+                  - HGNC
+                  - UniProt-TrEMBL
+  /{organism}/targetDataSources:
+    get:
+      tags:
+        - organism
+      summary: List data sources usable as mapping targets
+      description: |-
+        Lists the data sources usable as a mapping **target** for the organism.
+      parameters:
+        - name: organism
+          in: path
+          required: true
+          description: Organism (Latin name or short name).
+          schema:
+            $ref: '#/components/schemas/Organism'
+          example: Human
+      responses:
+        "200":
+          description: |-
+            Target data sources. `text/plain`: one full name per line.
+            `application/json`: `{"supportedTargetDatasources":[...]}`.
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: |-
+                Ensembl
+                Entrez Gene
+                HGNC
+                UniProt-TrEMBL
+            application/json:
+              schema:
+                type: object
+                properties:
+                  supportedTargetDatasources:
+                    type: array
+                    items:
+                      type: string
+              example:
+                supportedTargetDatasources:
+                  - Ensembl
+                  - Entrez Gene
+                  - HGNC
+                  - UniProt-TrEMBL
+  /{organism}/isFreeSearchSupported:
+    get:
+      tags:
+        - organism
+      summary: Whether free-text search is supported
+      description: |-
+        Returns whether the organism's mapper supports free-text search (the `/{organism}/search`
+        and `/{organism}/attributeSearch` endpoints).
+      parameters:
+        - name: organism
+          in: path
+          required: true
+          description: Organism (Latin name or short name).
+          schema:
+            $ref: '#/components/schemas/Organism'
+          example: Human
+      responses:
+        "200":
+          description: |-
+            `text/plain`: the literal `true` or `false`. `application/json`: `{"isSupported":true}`.
+          content:
+            text/plain:
+              schema:
+                type: string
+                enum:
+                  - "true"
+                  - "false"
+              example: "true"
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isSupported:
+                    type: boolean
+              example:
+                isSupported: true
+  /{organism}/isMappingSupported/{sourceSystemCode}/{targetSystemCode}:
+    get:
+      tags:
+        - organism
+      summary: Whether a source→target mapping is supported
+      description: |-
+        Returns whether mapping from the source data source to the target data source is possible
+        for the organism. Combines the results of `/{organism}/sourceDataSources` and
+        `/{organism}/targetDataSources` into a single boolean. **Call this before a mapping when
+        unsure** to distinguish "unsupported" from "supported but no hit".
+      parameters:
+        - name: organism
+          in: path
+          required: true
+          description: Organism (Latin name or short name).
+          schema:
+            $ref: '#/components/schemas/Organism'
+          example: Human
+        - name: sourceSystemCode
+          in: path
+          required: true
+          description: System code of the source data source.
+          schema:
+            $ref: '#/components/schemas/SystemCode'
+          example: En
+        - name: targetSystemCode
+          in: path
+          required: true
+          description: System code of the target data source.
+          schema:
+            $ref: '#/components/schemas/SystemCode'
+          example: S
+      responses:
+        "200":
+          description: |-
+            `text/plain`: the literal `true` or `false`. `application/json`: `{"supported: ":"true"}`.
+          content:
+            text/plain:
+              schema:
+                type: string
+                enum:
+                  - "true"
+                  - "false"
+              example: "true"
+            application/json:
+              schema:
+                type: object
+              example:
+                "supported: ": "true"
 components:
     schemas:
       SystemCode:
         type: string
-        description: System code as used by BridgeDb, see [this list](https://www.bridgedb.org/pages/system-codes.html).
+        description: |-
+          BridgeDb system code naming a data source (case-sensitive). Pass the code, never the
+          display name. See [the system-code list](https://www.bridgedb.org/pages/system-codes.html).
         default: En
+        example: En
         enum:
           - En
           - Cs
@@ -434,7 +1316,9 @@ components:
           - Cks
       Organism:
         type: string
+        description: Organism, given as its Latin binomial (e.g. `Homo sapiens`) or common short name (e.g. `Human`).
         default: Human
+        example: Human
         enum:
           - Human
           - Homo sapiens
@@ -499,8 +1383,20 @@ components:
           - Mus musculus
       XrefBatchInput:
         type: string
-        description: TAB separated values with one identifier/system code combination per line
+        description: |-
+          Batch body for the per-line-source-code routes (`/xrefsBatch`, `/xrefsBatch/targetDs`).
+          TAB-separated values, one `identifier<TAB>systemCode` combination per line.
         example: |-
           Q90038963	Wd
           P0DTD1-PRO_0000449625	S
           ENSMUSG00000032462	En
+      XrefBatchIdList:
+        type: string
+        description: |-
+          Batch body for the single-source routes (`/xrefsBatch/{systemCode}`,
+          `/xrefsBatch/{systemCode}/targetDs`). One bare identifier per line — the source system
+          code is fixed by the path.
+        example: |-
+          ENSG00000139618
+          ENSG00000141510
+          ENSG00000012048
