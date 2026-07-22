@@ -78,7 +78,8 @@ public class RestletService extends Application{
 	public static final String URL_SWAGGER_INIT = "/swagger-initializer.js";
 	public static final String URL_SWAGGER_UIBUNDLEJS = "/swagger-ui-bundle.js";
 	public static final String URL_SWAGGER_PRESET = "/swagger-ui-standalone-preset.js";
-	
+	public static final String URL_LLMS_TXT = "/llms.txt";
+
 	private GdbProvider gdbProvider;
 	
 	public RestletService(File aConfigFile, boolean transitive, boolean cors, String serverURL)
@@ -132,6 +133,7 @@ public class RestletService extends Application{
 		router.attach(URL_SWAGGER_UIBUNDLEJS, SwaggerUI.class);
 		router.attach(URL_SWAGGER_INIT, SwaggerUI.class);
 		router.attach(URL_SWAGGER_PRESET, SwaggerUI.class);
+		router.attach(URL_LLMS_TXT, SwaggerUI.class);
 
 		router.attach(URL_FAVICON, Favicon.class);
 
