@@ -15,19 +15,6 @@ body {
     background: #fafafa;
 }
 
-/* BridgeDb logo header shown above the Swagger UI (fallback, always visible) */
-.bridgedb-logo-header {
-    background-color: #ffffff;
-    padding: 12px 20px;
-    border-bottom: 1px solid #e8e8e8;
-}
-
-.bridgedb-logo-header img {
-    height: 40px;
-    width: auto;
-    display: block;
-}
-
 /* Replace the default Swagger logo in the StandaloneLayout top bar with the BridgeDb logo */
 .topbar {
     background-color: #ffffff;
