@@ -4,130 +4,16 @@ info:
   title: BridgeDb Webservices
   description: |-
     The [BridgeDb Webservices](https://github.com/bridgedb/BridgeDbWebservice) translate
-    biological and chemical identifiers from one database into another — for example an
-    Ensembl gene ID into an HGNC symbol, or an HMDB metabolite into a ChEBI ID.
+    biological and chemical identifiers from one database into another (e.g. an Ensembl gene
+    ID into an HGNC symbol, or an HMDB metabolite into a ChEBI ID).
 
-    > **Response format is TAB-delimited plain text by default, not JSON.** Add the header
-    > `Accept: application/json` to any endpoint below to receive JSON instead. Do not
-    > `JSON.parse` the default response — split on `\n` for lines and `\t` for fields.
+    Responses are TAB-delimited plain text by default; add the header `Accept: application/json`
+    for JSON. An identifier is addressed as an *xref* — the identifier plus its data-source
+    [system code](https://www.bridgedb.org/pages/system-codes.html) (e.g. `En` = Ensembl,
+    `S` = UniProt, `Ch` = HMDB) — scoped to an organism (`Human` / `Homo sapiens`).
 
-    ## Mental model: xrefs, data sources, system codes, organisms
-
-    BridgeDb answers one question: *"Given this identifier from this database, in this
-    organism, what are the equivalent identifiers in other databases?"*
-
-    - **Xref (cross-reference)** — an identifier **plus the data source it belongs to**.
-      `ENSG00000139618` alone is ambiguous; the xref is the pair `(ENSG00000139618, Ensembl)`.
-      Every call therefore carries both an identifier and a system code.
-    - **Data source** — a database/namespace that issues identifiers (Ensembl, HGNC, UniProt,
-      HMDB, ChEBI, Wikidata, …).
-    - **System code** — a short, **case-sensitive** letter code (1–3 chars) naming a data source
-      compactly in URLs and responses. `En` = Ensembl, `H` = HGNC, `S` = UniProt, `Ch` = HMDB,
-      `Ce` = ChEBI, `Wd` = Wikidata. **Pass the code, never the display name** — `Ensembl` where
-      `En` is expected fails, and `EN`/`en` are not `En`.
-    - **Organism** — mappings are partitioned per organism (each has its own mapping database).
-      Name the organism in every mapping call, either as the **Latin binomial** (`Homo sapiens`)
-      or a **common short name** (`Human`); the organism code (`Hs`) also resolves. Metabolite /
-      chemistry mappings are typically served under `Human`.
-
-    A mapping request always resolves to: **organism + source system code + source identifier →
-    identifiers in one or all target system codes.**
-
-    ## Choosing organism and system codes
-
-    Use the exact organism spelling (case and spacing matter); URL-encode spaces as `%20` with
-    strict clients. Rough system-code picks:
-
-    - **Genes** — Ensembl `En`, NCBI/Entrez Gene `L`, HGNC symbol `H`, RefSeq `Q`, UniGene `U`,
-      UCSC `Uc`, OMIM `Om`.
-    - **Proteins** — UniProt `S`, PDB `Pd`.
-    - **Metabolites / chemicals** — HMDB `Ch`, ChEBI `Ce`, KEGG Compound `Ck`, ChemSpider `Cs`,
-      PubChem-compound `Cpc`, CAS `Ca`, InChIKey `Ik`, LIPID MAPS `Lm`, Wikidata `Wd`.
-
-    If unsure whether a source→target mapping exists for an organism, **check first** with
-    `GET /{organism}/isMappingSupported/{src}/{dest}` rather than issuing a call that returns empty
-    — this separates "unsupported" from "supported but no hit".
-
-    ## Reading TAB-delimited responses
-
-    - **Single-xref calls** (`/xrefs/...`) return one xref per line as `identifier\tsystemCode`.
-      Split each non-empty line on the first tab; field 1 is the target identifier, field 2 the
-      target system code. The source xref is usually echoed back.
-    - **Batch calls** (`/xrefsBatch...`) return one **input** per line as
-      `queryId\tquerySystemCode\tid1,code1,id2,code2,...` — the result block is **comma-delimited**
-      (alternating id/code pairs), not tab-delimited. An empty third field means no mapping found.
-    - **Boolean calls** (`isMappingSupported`, `isFreeSearchSupported`, `xrefExists`) return the
-      literal text `true` or `false` (JSON form: a small object such as `{"exists":true}`).
-    - **Empty result ≠ error.** A `200` with no lines means no cross-references were found.
-
-    ## Batch body format
-
-    Batch endpoints are **POST** with a `text/plain` body, one entry per line:
-
-    - `POST /{organism}/xrefsBatch` and `.../xrefsBatch/targetDs` — every line carries its own
-      source code: `identifier<TAB>systemCode`.
-    - `POST /{organism}/xrefsBatch/{systemCode}` and `.../{systemCode}/targetDs` — the source code
-      is fixed by the path, so lines are **bare identifiers**, one per line.
-
-    Restrict a batch to one target database with the `?targetDs=CODE` query parameter (for single
-    GET mapping the target is a path segment instead: `.../xrefs/{code}/{id}/{targetCode}`).
-
-    ## System-code quick reference
-
-    | Code | Data source | Category | | Code | Data source | Category |
-    |------|-------------|----------|-|------|-------------|----------|
-    | `En` | Ensembl | Gene | | `Ce` | ChEBI | Metabolite |
-    | `L` | NCBI/Entrez Gene | Gene | | `Ch` | HMDB | Metabolite |
-    | `H` | HGNC (symbol) | Gene | | `Ck` | KEGG Compound | Metabolite |
-    | `Q` | RefSeq | Gene/RNA/Protein | | `Cs` | ChemSpider | Metabolite |
-    | `U` | UniGene | Gene | | `Cpc` | PubChem-compound | Metabolite |
-    | `Uc` | UCSC | Gene | | `Ca` | CAS | Metabolite |
-    | `Om` | OMIM | Gene/disease | | `Ik` | InChIKey | Metabolite |
-    | `S` | UniProt (TrEMBL) | Protein | | `Lm` | LIPID MAPS | Metabolite/lipid |
-    | `Pd` | PDB | Protein structure | | `Cks` | KNApSAcK | Metabolite |
-    | `E` | EC number | Enzyme | | `Wd` | Wikidata | General |
-    | `T` | Gene Ontology | Ontology | | `Wi` | Wikipedia | General |
-    | `X` | Affymetrix probeset | Probe | | `Re` | Reactome | Pathway |
-    | `Il` | Illumina | Probe | | `Rh` | Rhea | Reaction |
-
-    The authoritative, always-current list is at
-    <https://www.bridgedb.org/pages/system-codes.html> and
-    <https://github.com/bridgedb/datasources>.
-
-    ## Worked examples
-
-    **1. Human Ensembl gene → all mappings**
-    ```
-    GET /Human/xrefs/En/ENSG00000139618          # BRCA2, all target databases
-    ```
-    Response (abbreviated), one `identifier\tsystemCode` per line:
-    ```
-    BRCA2	H
-    P51587	S
-    NM_000059	Q
-    600185	Om
-    ```
-
-    **2. Same gene, only HGNC symbol**
-    ```
-    GET /Human/xrefs/En/ENSG00000139618/H        # -> BRCA2	H
-    ```
-
-    **3. Batch many genes → UniProt only**
-    ```
-    POST /Human/xrefsBatch/En?targetDs=S
-    Content-Type: text/plain
-
-    ENSG00000139618
-    ENSG00000141510
-    ENSG00000012048
-    ```
-    Response — one line per input, third field comma-joined `id,code` pairs:
-    ```
-    ENSG00000139618	En	P51587,S
-    ENSG00000141510	En	P04637,S
-    ENSG00000012048	En	P38398,S
-    ```
+    A full mapping guide for programmatic and LLM use — system codes, TAB and batch response
+    formats, and worked examples — is served as plain text at [/llms.txt](/llms.txt).
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
