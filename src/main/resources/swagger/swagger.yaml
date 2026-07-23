@@ -4,16 +4,16 @@ info:
   title: BridgeDb Webservices
   description: |-
     The [BridgeDb Webservices](https://github.com/bridgedb/BridgeDbWebservice) translate
-    biological and chemical identifiers from one database into another (e.g. an Ensembl gene
-    ID into an HGNC symbol, or an HMDB metabolite into a ChEBI ID).
+    biological and chemical identifiers from one database into the equivalent identifiers
+    in other databases.
 
-    Responses are TAB-delimited plain text by default; add the header `Accept: application/json`
-    for JSON. An identifier is addressed as an *xref* — the identifier plus its data-source
-    [system code](https://www.bridgedb.org/pages/system-codes.html) (e.g. `En` = Ensembl,
-    `S` = UniProt, `Ch` = HMDB) — scoped to an organism (`Human` / `Homo sapiens`).
+    Responses are TAB-delimited plain text by default. Add the header
+    `Accept: application/json` to get JSON instead. Each identifier is paired with a
+    [system code](https://www.bridgedb.org/pages/system-codes.html) for the database it
+    comes from, and every mapping is scoped to an organism.
 
-    A full mapping guide for programmatic and LLM use — system codes, TAB and batch response
-    formats, and worked examples — is served as plain text at [/llms.txt](/llms.txt).
+    A full mapping guide for programmatic and LLM use is served as plain text at
+    [/llms.txt](/llms.txt).
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -27,7 +27,7 @@ tags:
   - name: search
     description: Free-text search for identifiers
   - name: attributes
-    description: Services to get and search attributes (e.g. gene symbols, descriptions)
+    description: Services to get and search attributes
   - name: discovery
     description: Deployment-wide, non-organism-scoped services (loaded organisms, data-source registry, runtime versions)
 paths:
@@ -44,7 +44,7 @@ paths:
         "200":
           description: |-
             `text/plain`: the raw datasources TSV dump. `application/json`: an object keyed by
-            data-source system code, each value an object of column-header → field value.
+            data-source system code, each value an object mapping column header to field value.
           content:
             text/plain:
               schema:
@@ -133,7 +133,7 @@ paths:
       description: |-
         Catch-all route for single-segment paths that did not match a more specific endpoint. It
         does **not** validate or use the organism value; it always returns a fixed
-        "Unrecognized query" HTML help page. `/{organism}` alone is not a data endpoint — use
+        "Unrecognized query" HTML help page. `/{organism}` alone is not a data endpoint. Use
         `/{organism}/xrefs/...` and the other routes below.
       parameters:
         - name: organism
@@ -183,7 +183,7 @@ paths:
         - name: dataSource
           in: query
           required: false
-          description: Optional target system code — keeps only results in this data source (client-side filter).
+          description: Optional target system code that keeps only results in this data source (client-side filter).
           schema:
             $ref: '#/components/schemas/SystemCode'
           example: H
@@ -252,7 +252,7 @@ paths:
         "200":
           description: |-
             Equivalent xrefs in the target data source. `text/plain`: one `identifier\tsystemCode`
-            per line. `application/json`: compact-identifier → data-source name.
+            per line. `application/json`: compact-identifier to data-source name.
           content:
             text/plain:
               schema:
@@ -272,7 +272,7 @@ paths:
         - mappings
       summary: Map a compact (Bioregistry) identifier to all equivalent xrefs
       description: |-
-        Maps a Bioregistry / compact identifier of the form `prefix:id` (e.g. `ensembl:ENSG00000139618`)
+        Maps a Bioregistry / compact identifier of the form `prefix:id`
         to all equivalent xrefs. The data source is resolved from the compact-identifier `prefix`.
         Prefer the explicit system-code route (`/{organism}/xrefs/{systemCode}/{identifier}`) for
         predictability; use this form when you already hold a compact identifier. `prefix` and
@@ -302,14 +302,14 @@ paths:
         - name: dataSource
           in: query
           required: false
-          description: Optional target system code — keeps only results in this data source.
+          description: Optional target system code that keeps only results in this data source.
           schema:
             $ref: '#/components/schemas/SystemCode'
           example: H
       responses:
         "200":
           description: |-
-            Equivalent xrefs. `application/json`: compact-identifier → data-source name.
+            Equivalent xrefs. `application/json`: compact-identifier to data-source name.
             `text/plain`: one `identifier\tsystemCode` per line. `text/html`: an HTML page linking
             each result to `https://bioregistry.org/<compactId>`.
           content:
@@ -437,7 +437,7 @@ paths:
       description: |-
         Same as `POST /{organism}/xrefsBatch`, but restricts every result to the single target
         data source given in the `targetDs` **query parameter**. The trailing path segment
-        `targetDs` is a literal string, not a variable — the actual target is the query parameter.
+        `targetDs` is a literal string, not a variable; the actual target is the query parameter.
       parameters:
         - name: organism
           in: path
@@ -620,8 +620,8 @@ paths:
       responses:
         "200":
           description: |-
-            Matching xrefs. `text/plain`: one `identifier\tsystemCode` per line (empty result → a
-            single newline). `application/json`: an object mapping identifier → data-source name.
+            Matching xrefs. `text/plain`: one `identifier\tsystemCode` per line (empty result returns a
+            single newline). `application/json`: an object mapping identifier to data-source name.
           content:
             text/plain:
               schema:
@@ -669,7 +669,7 @@ paths:
         "200":
           description: |-
             Matching xrefs, at most `limit`. `text/plain`: one `identifier\tsystemCode` per line.
-            `application/json`: identifier → data-source name.
+            `application/json`: identifier to data-source name.
           content:
             text/plain:
               schema:
@@ -713,7 +713,7 @@ paths:
         "200":
           description: |-
             Matching xrefs with their matched attribute value. `text/plain`: one
-            `id\tfullName\tattributeValue` per line (empty result → a single newline).
+            `id\tfullName\tattributeValue` per line (empty result returns a single newline).
             `application/json`: `{ id: {"full name: ": fullName, "xref: ": attributeValue} }`.
           content:
             text/plain:
@@ -796,8 +796,7 @@ paths:
         - attributes
       summary: Get all attributes for an xref
       description: |-
-        Returns all stored attributes (all types) for one xref — for example the gene symbol,
-        description, chromosome, or type — rather than its cross-references.
+        Returns all stored attributes (all types) for one xref, rather than its cross-references.
       parameters:
         - name: organism
           in: path
@@ -824,7 +823,7 @@ paths:
         "200":
           description: |-
             The xref's attributes. `text/plain`: one `attrName\tvalue` per line.
-            `application/json`: a flat object mapping attribute name → value.
+            `application/json`: a flat object mapping attribute name to value.
           content:
             text/plain:
               schema:
@@ -851,7 +850,7 @@ paths:
       summary: Get one attribute type for an xref
       description: |-
         Returns only the values of a single attribute type for an xref. The trailing path segment
-        `attrName` is a literal string, not a variable — the attribute type itself is supplied via
+        `attrName` is a literal string, not a variable; the attribute type itself is supplied via
         the `attrName` **query parameter**. If `attrName` is omitted, the resource falls back to
         all-attributes behaviour.
       parameters:
@@ -879,7 +878,7 @@ paths:
         - name: attrName
           in: query
           required: false
-          description: Attribute type to return (e.g. `Symbol`). See `/{organism}/attributeSet`.
+          description: Attribute type to return. See `/{organism}/attributeSet`.
           schema:
             type: string
           example: Symbol
@@ -907,8 +906,7 @@ paths:
         - organism
       summary: List available attribute names
       description: |-
-        Lists the set of attribute names available across the organism's mapper stack (e.g.
-        `Symbol`, `Chromosome`, `Type`, `Description`). Use these names to drive
+        Lists the set of attribute names available across the organism's mapper stack. Use these names to drive
         `/{organism}/attributeSearch` and `/{organism}/attributes`.
       parameters:
         - name: organism
@@ -988,7 +986,7 @@ paths:
         - organism
       summary: List data sources usable as mapping sources
       description: |-
-        Lists the data sources usable as a mapping **source** for the organism — i.e. which system
+        Lists the data sources usable as a mapping **source** for the organism, i.e. which system
         codes are valid inputs.
       parameters:
         - name: organism
@@ -1109,7 +1107,7 @@ paths:
     get:
       tags:
         - organism
-      summary: Whether a source→target mapping is supported
+      summary: Whether a source-to-target mapping is supported
       description: |-
         Returns whether mapping from the source data source to the target data source is possible
         for the organism. Combines the results of `/{organism}/sourceDataSources` and
@@ -1202,7 +1200,7 @@ components:
           - Cks
       Organism:
         type: string
-        description: Organism, given as its Latin binomial (e.g. `Homo sapiens`) or common short name (e.g. `Human`).
+        description: Organism, given as its Latin binomial or common short name.
         default: Human
         example: Human
         enum:
@@ -1280,7 +1278,7 @@ components:
         type: string
         description: |-
           Batch body for the single-source routes (`/xrefsBatch/{systemCode}`,
-          `/xrefsBatch/{systemCode}/targetDs`). One bare identifier per line — the source system
+          `/xrefsBatch/{systemCode}/targetDs`). One bare identifier per line; the source system
           code is fixed by the path.
         example: |-
           ENSG00000139618
