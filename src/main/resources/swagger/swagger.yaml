@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  version: '%%BRIDGEDB-WEBSERVICE-VERSION%%'
+  version: %%BRIDGEDB-WEBSERVICE-VERSION%%
   title: BridgeDb Webservices
   description: |-
     The [BridgeDb Webservices](https://github.com/bridgedb/BridgeDbWebservice) translate
@@ -132,7 +132,7 @@ info:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
 servers:
-  - url: '%%BRIDGEDB-SERVER-URL%%'
+  - url: %%BRIDGEDB-SERVER-URL%%
 tags:
   - name: mappings
     description: Identifier mapping services for gene products (genes, RNA, proteins), metabolites, nutrients, hormones, vitamins, drugs, peptides, and chemical compounds from the exposome
