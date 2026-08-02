@@ -61,8 +61,8 @@
             <version>${bridgedb-version}</version>
             <exclusions>
                 <exclusion>
-                    <groupId>mysql</groupId>
-                    <artifactId>mysql-connector-java</artifactId>
+                    <groupId>com.mysql</groupId>
+                    <artifactId>mysql-connector-j</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
