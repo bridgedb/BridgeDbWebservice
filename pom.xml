@@ -17,6 +17,10 @@
         <url>https://maven.restlet.talend.com/</url>
         <layout>default</layout>
     </repository>
+    <repository>
+      <id>central-snapshots</id>
+      <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+    </repository>
   </repositories>
 
   <properties>
