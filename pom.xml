@@ -25,10 +25,10 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>11</maven.compiler.source>
-    <maven.compiler.target>11</maven.compiler.target>
+    <maven.compiler.source>21</maven.compiler.source>
+    <maven.compiler.target>21</maven.compiler.target>
     <restlet-version>2.4.4</restlet-version>
-    <bridgedb-version>3.0.31</bridgedb-version>
+    <bridgedb-version>4.0.0</bridgedb-version>
     <junit.version>5.14.1</junit.version>
   </properties>
 
@@ -57,14 +57,8 @@
         </dependency>
          <dependency>
             <groupId>org.bridgedb</groupId>
-            <artifactId>org.bridgedb.rdb</artifactId>
+            <artifactId>org.bridgedb.rdb.derby</artifactId>
             <version>${bridgedb-version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.mysql</groupId>
-                    <artifactId>mysql-connector-j</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.bridgedb.webservice</groupId>
