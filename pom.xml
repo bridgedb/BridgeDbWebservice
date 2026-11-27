@@ -4,19 +4,13 @@
 
   <groupId>org.bridgedb.webservicetesting</groupId>
   <artifactId>BridgeDbWebservice</artifactId>
-  <version>2.1.9</version>
+  <version>3.0.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>BridgeDbWebservice</name>
   <url>https://bridgedb.github.io/</url>
 
   <repositories>
-    <repository>
-        <id>maven-restlet</id>
-        <name>Restlet repository</name>
-        <url>https://maven.restlet.talend.com/</url>
-        <layout>default</layout>
-    </repository>
     <repository>
       <id>central-snapshots</id>
       <url>https://central.sonatype.com/repository/maven-snapshots/</url>
@@ -25,10 +19,10 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>11</maven.compiler.source>
-    <maven.compiler.target>11</maven.compiler.target>
-    <restlet-version>2.4.4</restlet-version>
-    <bridgedb-version>3.0.31</bridgedb-version>
+    <maven.compiler.source>21</maven.compiler.source>
+    <maven.compiler.target>21</maven.compiler.target>
+    <restlet-version>2.6.1</restlet-version>
+    <bridgedb-version>4.0.1</bridgedb-version>
     <junit.version>5.14.1</junit.version>
   </properties>
 
@@ -57,14 +51,8 @@
         </dependency>
          <dependency>
             <groupId>org.bridgedb</groupId>
-            <artifactId>org.bridgedb.rdb</artifactId>
+            <artifactId>org.bridgedb.rdb.derby</artifactId>
             <version>${bridgedb-version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.mysql</groupId>
-                    <artifactId>mysql-connector-j</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.bridgedb.webservice</groupId>
@@ -72,29 +60,29 @@
             <version>${bridgedb-version}</version>
         </dependency>
 	<dependency>
-        <groupId>org.restlet.jse</groupId>
+        <groupId>org.restlet</groupId>
         <artifactId>org.restlet</artifactId>
         <version>${restlet-version}</version>
     </dependency>
     <dependency>
-        <groupId>org.restlet.jse</groupId>
+        <groupId>org.restlet</groupId>
         <artifactId>org.restlet.ext.jackson</artifactId>
         <version>${restlet-version}</version>
     </dependency>
 	<dependency>
-	    <groupId>org.restlet.jee</groupId>
+	    <groupId>org.restlet</groupId>
 	    <artifactId>org.restlet.ext.json</artifactId>
 	    <version>${restlet-version}</version>
 	</dependency>
 	<dependency>
 	    <groupId>org.json</groupId>
 	    <artifactId>json</artifactId>
-	    <version>20260719</version>
+	    <version>20260814</version>
 	</dependency>
 	<dependency>
         <groupId>com.google.code.gson</groupId>
         <artifactId>gson</artifactId>
-        <version>2.14.0</version>
+        <version>2.15.0</version>
         <scope>provided</scope>
 	</dependency>
 	<dependency>

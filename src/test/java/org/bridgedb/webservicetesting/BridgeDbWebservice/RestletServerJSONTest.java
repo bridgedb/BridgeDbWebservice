@@ -136,7 +136,7 @@ public class RestletServerJSONTest {
 
         JSONTokener tokener = new JSONTokener(reply);
         JSONObject root = new JSONObject(tokener);
-        assertEquals("Uniprot-TrEMBL", ((JSONObject)root.get("P0DTD1-PRO_0000449625")).get("datasource"));
+        assertEquals("UniProtKB", ((JSONObject)root.get("P0DTD1-PRO_0000449625")).get("datasource"));
     }
 
     @Test
@@ -181,7 +181,7 @@ public class RestletServerJSONTest {
         JSONTokener tokener = new JSONTokener(reply);
         JSONObject root = new JSONObject(tokener);
         assertEquals("Wikidata", root.get("wikidata:Q90038963"));
-        assertEquals("Uniprot-TrEMBL", root.get("uniprot:P0DTD1-PRO_0000449625"));
+        assertEquals("UniProtKB", root.get("uniprot:P0DTD1-PRO_0000449625"));
     }
 
     @Test
@@ -192,7 +192,7 @@ public class RestletServerJSONTest {
 
         JSONTokener tokener = new JSONTokener(reply);
         JSONObject root = new JSONObject(tokener);
-        assertEquals("Uniprot-TrEMBL", root.get("uniprot:P0DTD1-PRO_0000449625"));
+        assertEquals("UniProtKB", root.get("uniprot:P0DTD1-PRO_0000449625"));
         JSONException thrown = assertThrows(
         	JSONException.class,
                 () -> root.get("wikidata:Q90038963")
@@ -273,7 +273,7 @@ public class RestletServerJSONTest {
         JSONTokener tokener = new JSONTokener(reply);
         JSONObject root = new JSONObject(tokener);
         assertEquals("Wikidata", root.get("wikidata:Q90038963"));
-        assertEquals("Uniprot-TrEMBL", root.get("uniprot:P0DTD1-PRO_0000449625"));
+        assertEquals("UniProtKB", root.get("uniprot:P0DTD1-PRO_0000449625"));
     }
 
     @Test
