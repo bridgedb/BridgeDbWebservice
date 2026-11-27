@@ -12,12 +12,6 @@
 
   <repositories>
     <repository>
-        <id>maven-restlet</id>
-        <name>Restlet repository</name>
-        <url>https://maven.restlet.talend.com/</url>
-        <layout>default</layout>
-    </repository>
-    <repository>
       <id>central-snapshots</id>
       <url>https://central.sonatype.com/repository/maven-snapshots/</url>
     </repository>
@@ -27,7 +21,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>
-    <restlet-version>2.4.4</restlet-version>
+    <restlet-version>2.6.1</restlet-version>
     <bridgedb-version>4.0.0</bridgedb-version>
     <junit.version>5.14.1</junit.version>
   </properties>
@@ -66,17 +60,17 @@
             <version>${bridgedb-version}</version>
         </dependency>
 	<dependency>
-        <groupId>org.restlet.jse</groupId>
+        <groupId>org.restlet</groupId>
         <artifactId>org.restlet</artifactId>
         <version>${restlet-version}</version>
     </dependency>
     <dependency>
-        <groupId>org.restlet.jse</groupId>
+        <groupId>org.restlet</groupId>
         <artifactId>org.restlet.ext.jackson</artifactId>
         <version>${restlet-version}</version>
     </dependency>
 	<dependency>
-	    <groupId>org.restlet.jee</groupId>
+	    <groupId>org.restlet</groupId>
 	    <artifactId>org.restlet.ext.json</artifactId>
 	    <version>${restlet-version}</version>
 	</dependency>
